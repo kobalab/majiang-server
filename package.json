@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/kobalab/majiang-server/issues"
   },
-  "homepage": "https://github.com/kobalab/majiang-server#readme"
+  "homepage": "https://github.com/kobalab/majiang-server#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
