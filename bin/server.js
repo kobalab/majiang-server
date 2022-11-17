@@ -18,7 +18,8 @@ const session = require('express-session')({
                             name:   'MAJIANG',
                             secret: 'keyboard cat',
                             resave: false,
-                            saveUninitialized: false });
+                            saveUninitialized: true });
+const socket_io_session = require('@kobalab/socket.io-session')(session);
 
 const app = express();
 app.use(session);
@@ -27,6 +28,7 @@ app.use((req, res)=>res.status(404).send('<h1>Not Found</h1>'));
 
 const http = require('http').createServer(app);
 const io   = require('socket.io')(http);
+io.use(socket_io_session.express_session);
 
 http.listen(port, ()=>{
     console.log(`Server start on http://127.0.0.1:${port}`);
