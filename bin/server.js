@@ -20,6 +20,7 @@ if (docs) app.use(express.static(docs));
 app.use((req, res)=>res.status(404).send('<h1>Not Found</h1>'));
 
 const http = require('http').createServer(app);
+const io   = require('socket.io')(http);
 
 http.listen(port, ()=>{
     console.log(`Server start on http://127.0.0.1:${port}`);
