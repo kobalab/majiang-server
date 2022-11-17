@@ -25,6 +25,7 @@
     "@kobalab/socket.io-session": "^1.0.4",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
+    "passport": "^0.6.0",
     "socket.io": "^4.5.3",
     "yargs": "^17.6.2"
   }
