@@ -14,8 +14,14 @@ const port = argv.port;
 const docs = argv._[0] && path.resolve(argv._[0]);
 
 const express = require('express');
+const session = require('express-session')({
+                            name:   'MAJIANG',
+                            secret: 'keyboard cat',
+                            resave: false,
+                            saveUninitialized: false });
 
 const app = express();
+app.use(session);
 if (docs) app.use(express.static(docs));
 app.use((req, res)=>res.status(404).send('<h1>Not Found</h1>'));
 
