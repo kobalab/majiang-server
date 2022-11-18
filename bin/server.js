@@ -13,22 +13,32 @@ const argv = yargs
 const port = argv.port;
 const docs = argv._[0] && path.resolve(argv._[0]);
 
-const express = require('express');
-const session = require('express-session')({
+const express  = require('express');
+const session  = require('express-session')({
                             name:   'MAJIANG',
                             secret: 'keyboard cat',
                             resave: false,
-                            saveUninitialized: true });
-const socket_io_session = require('@kobalab/socket.io-session')(session);
+                            saveUninitialized: false });
+const passport = require('../lib/passport');
+const socket_io_session
+               = require('@kobalab/socket.io-session')(session, passport);
 
 const app = express();
 app.use(session);
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(express.urlencoded({ limit: '4mb', extended: false }));
+app.post('/', passport.authenticate('local',
+                                    { successRedirect: '/',
+                                      failureRedirect: '/' }));
 if (docs) app.use(express.static(docs));
 app.use((req, res)=>res.status(404).send('<h1>Not Found</h1>'));
 
 const http = require('http').createServer(app);
 const io   = require('socket.io')(http);
 io.use(socket_io_session.express_session);
+io.use(socket_io_session.passport_initialize);
+io.use(socket_io_session.passport_session);
 
 http.listen(port, ()=>{
     console.log(`Server start on http://127.0.0.1:${port}`);
