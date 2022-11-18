@@ -20,8 +20,6 @@ const session  = require('express-session')({
                             resave: false,
                             saveUninitialized: false });
 const passport = require('../lib/passport');
-const socket_io_session
-               = require('@kobalab/socket.io-session')(session, passport);
 
 const app = express();
 app.use(session);
@@ -34,11 +32,14 @@ app.post('/', passport.authenticate('local',
 if (docs) app.use(express.static(docs));
 app.use((req, res)=>res.status(404).send('<h1>Not Found</h1>'));
 
+const wrap = (middle_wear)=>
+                    (socket, next)=> middle_wear(socket.request, {}, next);
+
 const http = require('http').createServer(app);
 const io   = require('socket.io')(http);
-io.use(socket_io_session.express_session);
-io.use(socket_io_session.passport_initialize);
-io.use(socket_io_session.passport_session);
+io.use(wrap(session));
+io.use(wrap(passport.initialize()));
+io.use(wrap(passport.session()));
 
 http.listen(port, ()=>{
     console.log(`Server start on http://127.0.0.1:${port}`);
