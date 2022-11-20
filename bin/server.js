@@ -8,9 +8,13 @@ const yargs = require('yargs');
 const argv = yargs
     .usage('Usage: $0 <docs>')
     .option('port', { alias: 'p', default: 4615 })
+    .option('baseurl', { alias: 'b', default: '/server'})
     .demandCommand(0)
     .argv;
 const port = argv.port;
+const base = ('' + argv.baseurl)
+                    .replace(/^(?!\/.*)/, '/$&')
+                    .replace(/\/$/,'');
 const docs = argv._[0] && path.resolve(argv._[0]);
 
 const express  = require('express');
@@ -26,7 +30,7 @@ app.use(session);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ limit: '4mb', extended: false }));
-app.post('/', passport.authenticate('local',
+app.post(`${base}/auth/`, passport.authenticate('local',
                                     { successRedirect: '/',
                                       failureRedirect: '/' }));
 if (docs) app.use(express.static(docs));
@@ -36,13 +40,13 @@ const wrap = (middle_wear)=>
                     (socket, next)=> middle_wear(socket.request, {}, next);
 
 const http = require('http').createServer(app);
-const io   = require('socket.io')(http);
+const io   = require('socket.io')(http, { path: `${base}/socket.io/` });
 io.use(wrap(session));
 io.use(wrap(passport.initialize()));
 io.use(wrap(passport.session()));
 
 http.listen(port, ()=>{
-    console.log(`Server start on http://127.0.0.1:${port}`);
+    console.log(`Server start on http://127.0.0.1:${port}${base}/`);
 }).on('error', (e)=>{
     console.log('' + e);
     process.exit(-1);
