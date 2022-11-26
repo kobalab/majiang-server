@@ -33,6 +33,11 @@ app.use(express.urlencoded({ limit: '4mb', extended: false }));
 app.post(`${base}/auth/`, passport.authenticate('local',
                                     { successRedirect: '/',
                                       failureRedirect: '/' }));
+app.post('/server/auth/hatena', passport.authenticate('hatena',
+                                        { scope: ['read_public'] }));
+app.get('/server/auth/hatena', passport.authenticate('hatena',
+                                        { successRedirect: '/',
+                                          failureRedirect: '/auth/' }));
 if (docs) app.use(express.static(docs));
 app.use((req, res)=>res.status(404).send('<h1>Not Found</h1>'));
 
