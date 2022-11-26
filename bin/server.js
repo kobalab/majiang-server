@@ -9,12 +9,14 @@ const argv = yargs
     .usage('Usage: $0 <docs>')
     .option('port', { alias: 'p', default: 4615 })
     .option('baseurl', { alias: 'b', default: '/server'})
+    .option('callback', { alias: 'c', default: '/' })
     .demandCommand(0)
     .argv;
 const port = argv.port;
 const base = ('' + argv.baseurl)
                     .replace(/^(?!\/.*)/, '/$&')
                     .replace(/\/$/,'');
+const back = argv.callback;
 const docs = argv._[0] && path.resolve(argv._[0]);
 
 const express  = require('express');
@@ -31,13 +33,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ limit: '4mb', extended: false }));
 app.post(`${base}/auth/`, passport.authenticate('local',
-                                    { successRedirect: '/',
-                                      failureRedirect: '/' }));
+                                    { successRedirect: back,
+                                      failureRedirect: back }));
 app.post('/server/auth/hatena', passport.authenticate('hatena',
                                         { scope: ['read_public'] }));
 app.get('/server/auth/hatena', passport.authenticate('hatena',
-                                        { successRedirect: '/',
-                                          failureRedirect: '/auth/' }));
+                                        { successRedirect: back }));
 if (docs) app.use(express.static(docs));
 app.use((req, res)=>res.status(404).send('<h1>Not Found</h1>'));
 
