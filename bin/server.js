@@ -7,8 +7,8 @@ const path  = require('path');
 const yargs = require('yargs');
 const argv = yargs
     .usage('Usage: $0 <docs>')
-    .option('port', { alias: 'p', default: 4615 })
-    .option('baseurl', { alias: 'b', default: '/server'})
+    .option('port',     { alias: 'p', default: 4615 })
+    .option('baseurl',  { alias: 'b', default: '/server'})
     .option('callback', { alias: 'c', default: '/' })
     .demandCommand(0)
     .argv;
