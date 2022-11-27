@@ -50,6 +50,12 @@ const io   = require('socket.io')(http, { path: `${base}/socket.io/` });
 io.use(wrap(session));
 io.use(wrap(passport.initialize()));
 io.use(wrap(passport.session()));
+io.on('connection', (sock)=>{
+    console.log('++ sesion:', sock.request.sessionID);              // for DEBUG
+    console.log('++ user:',   sock.request.user);                   // for DEBUG
+    sock.emit('hello', sock.request.user);
+    sock.onAny((...args)=> console.log(`++ ${sock.id}`, args));     // for DEBUG
+});
 
 http.listen(port, ()=>{
     console.log(`Server start on http://127.0.0.1:${port}${base}/`);
