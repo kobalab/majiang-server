@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "description": "麻雀サーバー",
   "private": true,
-  "main": "index.js",
+  "bin": {
+    "majiang-server": "./bin/server.js"
+  },
   "scripts": {
     "start": "node bin/server.js"
   },
