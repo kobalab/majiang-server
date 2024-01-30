@@ -2,6 +2,9 @@
 
 麻雀サーバー (α版)
 
+## デモ
+https://kobalab.net/majiang-server/netplay.html
+
 ## 使用方法
 
 ### majiang-server [ *options*... ] [ *docs* ]
