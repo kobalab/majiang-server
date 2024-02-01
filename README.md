@@ -12,7 +12,7 @@ https://kobalab.net/majiang-server/netplay.html
 <dt>--posrt, -p</dt>
     <dd>麻雀サーバーを起動するポート番号(デフォルトは <code>4615</code>)</dd>
 <dt>--baseurl, -b</dt>
-    <dd>socket.io のエントリポイント(デフォルトは <code>/sever</code>)</dd>
+    <dd>socket.io のエントリポイント(デフォルトは <code>/server</code>)</dd>
 <dt>--callback, -c</dt>
     <dd>認証からの復帰URL(デフォルトは <code>/</code>)</dd>
 <dt>--oauth, -o</dt>
