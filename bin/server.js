@@ -7,13 +7,13 @@ const path  = require('path');
 
 const yargs = require('yargs');
 const argv = yargs
-    .usage('Usage: $0 <docs>')
+    .usage('Usage: $0 [ options... ]')
     .option('port',     { alias: 'p', default: 4615 })
     .option('baseurl',  { alias: 'b', default: '/server'})
     .option('callback', { alias: 'c', default: '/' })
+    .option('docs',     { alias: 'd' })
     .option('oauth',    { alias: 'o' })
     .option('verbose',  { alias: 'v', boolean: true })
-    .demandCommand(0)
     .argv;
 const port = argv.port;
 const base = ('' + argv.baseurl)
@@ -21,7 +21,7 @@ const base = ('' + argv.baseurl)
                     .replace(/\/$/,'');
 const back = argv.callback;
 const auth = argv.oauth && path.resolve(argv.oauth);
-const docs = argv._[0] && path.resolve(argv._[0]);
+const docs = argv.docs && path.resolve(argv.docs);
 
 const express  = require('express');
 const session  = require('express-session')({
