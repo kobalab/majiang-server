@@ -2,7 +2,9 @@
   "name": "@kobalab/majiang-server",
   "version": "0.1.0",
   "description": "麻雀サーバー",
-  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "majiang-server": "./bin/server.js"
   },
