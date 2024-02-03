@@ -5,6 +5,11 @@
 ## デモ
 https://kobalab.net/majiang-server/netplay.html
 
+## インストール
+```bash
+$ npm i -g @kobalab/majiang-server
+```
+
 ## 使用方法
 
 ### majiang-server [ *options*... ] [ *docs* ]
