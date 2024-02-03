@@ -12,6 +12,7 @@ const argv = yargs
     .option('baseurl',  { alias: 'b', default: '/server'})
     .option('callback', { alias: 'c', default: '/' })
     .option('oauth',    { alias: 'o' })
+    .option('verbose',  { alias: 'v', boolean: true })
     .demandCommand(0)
     .argv;
 const port = argv.port;
@@ -57,7 +58,7 @@ const room = require('../lib/room');
 io.use(wrap(session));
 io.use(wrap(passport.initialize()));
 io.use(wrap(passport.session()));
-room(io);
+room(io, argv.verbose);
 
 http.listen(port, ()=>{
     console.log(`Server start on http://127.0.0.1:${port}${base}/`);
