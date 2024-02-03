@@ -17,7 +17,7 @@ $ npm i -g @kobalab/majiang-server
 
 ### majiang-server [ *options*... ]
 <dl>
-<dt>--posrt, -p</dt>
+<dt>--port, -p</dt>
     <dd>麻雀サーバーを起動するポート番号(デフォルトは <code>4615</code>)</dd>
 <dt>--baseurl, -b</dt>
     <dd>socket.io のエントリポイント(デフォルトは <code>/server</code>)</dd>
