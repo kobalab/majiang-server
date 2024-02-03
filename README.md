@@ -15,7 +15,7 @@ $ npm i -g @kobalab/majiang-server
 
 ## 使用方法
 
-### majiang-server [ *options*... ] [ *docs* ]
+### majiang-server [ *options*... ]
 <dl>
 <dt>--posrt, -p</dt>
     <dd>麻雀サーバーを起動するポート番号(デフォルトは <code>4615</code>)</dd>
