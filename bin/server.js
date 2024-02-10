@@ -13,6 +13,7 @@ const argv = yargs
     .option('callback', { alias: 'c', default: '/' })
     .option('docroot',  { alias: 'd' })
     .option('oauth',    { alias: 'o' })
+    .option('store',    { alias: 's' })
     .option('verbose',  { alias: 'v', boolean: true })
     .argv;
 const port = argv.port;
@@ -24,11 +25,18 @@ const auth = argv.oauth && path.resolve(argv.oauth);
 const docs = argv.docroot && path.resolve(argv.docroot);
 
 const express  = require('express');
+const store    = ! argv.store ? null
+               : new (require('session-file-store')(
+                        require('express-session')))(
+                            { path: path.resolve(argv.store) });
 const session  = require('express-session')({
                             name:   'MAJIANG',
                             secret: 'keyboard cat',
                             resave: false,
-                            saveUninitialized: false });
+                            saveUninitialized: false,
+                            store:  store,
+                            rolling: true,
+                            cookie: { maxAge: 1000*60*60*24*14 } });
 const passport = require('../lib/passport')(auth);
 
 const app = express();
