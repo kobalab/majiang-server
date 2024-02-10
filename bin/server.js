@@ -53,6 +53,11 @@ if (auth && fs.existsSync(path.join(auth, 'hatena.json'))) {
     app.get(`${base}/auth/hatena`, passport.authenticate('hatena',
                                             { successRedirect: back }));
 }
+app.post(`${base}/logout`, (req, res)=>{
+    req.session.destroy();
+    res.clearCookie('MAJIANG');
+    res.redirect(302, back);
+});
 if (docs) app.use(express.static(docs));
 app.use((req, res)=>res.status(404).send('<h1>Not Found</h1>'));
 
