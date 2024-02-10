@@ -2,7 +2,7 @@
 
 麻雀サーバー (β版)
 
-WebSocket を使った麻雀サーバーの実装です。
+WebSocket(socket.io)を使った麻雀サーバーの実装です。
 [電脳麻将](https://github.com/kobalab/Majiang) からの利用を想定しています。
 
 ## デモ
@@ -27,6 +27,8 @@ $ npm i -g @kobalab/majiang-server
     <dd>サーバの配信する静的コンテンツの配置ディレクトリ(省略可能)</dd>
 <dt>--oauth, -o</dt>
     <dd>OAuth認証定義ファイルの配置ディレクトリ(省略可能)</dd>
+<dt>--store, -s</dt>
+    <dd>セッションデータを保存するディレクトリ(省略可能)</dd>
 <dt>--verbose, -v</dt>
     <dd>標準出力にデバッグログを出力する</dd>
 </dl>
