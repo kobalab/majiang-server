@@ -1,12 +1,12 @@
 # majiang-server
 
-麻雀サーバー (β版)
+麻雀サーバー
 
 WebSocket(socket.io)を使った麻雀サーバーの実装です。
-[電脳麻将](https://github.com/kobalab/Majiang) からの利用を想定しています。
+[電脳麻将](https://github.com/kobalab/Majiang) ver.2.3.0 で追加したネット対戦は、本サーバーに接続して実現しています。
 
 ## デモ
-https://kobalab.net/majiang-server/netplay.html
+https://kobalab.net/majiang/netplay.html
 
 ## インストール
 ```bash
