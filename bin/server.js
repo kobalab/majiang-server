@@ -56,7 +56,10 @@ if (auth && fs.existsSync(path.join(auth, 'hatena.json'))) {
 if (auth && fs.existsSync(path.join(auth, 'google.json'))) {
     app.post(`${base}/auth/google`, passport.authenticate('google',
                                             { scope: ['profile'] }));
-    app.get(`${base}/auth/google`, passport.authenticate('google',
+    app.get(`${base}/auth/google`,  (req, res, next)=>{
+        if (req.query.error) res.redirect(302, back);
+        else                 next();                                    },
+                                    passport.authenticate('google',
                                             { successRedirect: back }));
 }
 app.post(`${base}/logout`, (req, res)=>{
