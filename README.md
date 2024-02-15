@@ -33,6 +33,8 @@ $ npm i -g @kobalab/majiang-server
     <dd>標準出力にデバッグログを出力する</dd>
 </dl>
 
+**関連記事:** [麻雀サーバーの使い方](https://blog.kobalab.net/entry/2024/02/15/081605)
+
 ## ライセンス
 [MIT](https://github.com/kobalab/majiang-server/blob/master/LICENSE)
 
