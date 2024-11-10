@@ -28,7 +28,8 @@ const express  = require('express');
 const store    = ! argv.store ? null
                : new (require('session-file-store')(
                         require('express-session')))(
-                            { path: path.resolve(argv.store) });
+                            { path:  path.resolve(argv.store),
+                              logFn: ()=>{} });
 const session  = require('express-session')({
                             name:   'MAJIANG',
                             secret: 'keyboard cat',
