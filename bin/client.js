@@ -4,6 +4,9 @@
 
 const io = require('socket.io-client');
 
+const Player = require('@kobalab/majiang-ai');
+const player = new Player();
+
 function post(url, param, cookie, callback) {
 
     const http = require(url.slice(0,5) == 'https' ? 'https' : 'http');
@@ -57,9 +60,16 @@ function init(url, cookie, room) {
 
     if (argv.verbose) sock.onAny(console.log);
     sock.on('ERROR', (msg)=>{ error(msg, cookie) });
-    sock.on('GAME',  (msg)=>{ sock.emit('GAME', { seq: msg.seq }) });
     sock.on('END',   ()   =>{ logout(cookie) });
     sock.on('ROOM',  ()   =>{ sock.on('HELLO', ()=>{ logout(cookie) })});
+    sock.on('GAME',  (msg)=>{
+        if (msg.seq) {
+            player.action(msg, (reply = {})=>{
+                reply.seq = msg.seq;
+                sock.emit('GAME', reply);
+            });
+        }
+    });
 
     process.on('SIGTERM', ()=>{ logout(cookie) });
     process.on('SIGINT',  ()=>{ logout(cookie) });
