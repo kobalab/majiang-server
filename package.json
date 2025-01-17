@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/kobalab/majiang-server#readme",
   "dependencies": {
+    "@kobalab/majiang-ai": "^1.0.13",
     "@kobalab/majiang-core": "^1.2.1",
     "express": "^4.21.0",
     "express-session": "^1.18.0",
