@@ -9,7 +9,9 @@ const io = require('socket.io-client');
 const Player = require('@kobalab/majiang-ai');
 const player = new Player();
 
-function post(url, param, cookie, callback) {
+let cookie;
+
+function post(url, param, callback) {
 
     const http = require(url.slice(0,5) == 'https' ? 'https' : 'http');
 
@@ -31,25 +33,26 @@ function post(url, param, cookie, callback) {
 
 function login(url, name, room) {
 
-    post(url + '/auth/', { name: name, passwd: '*'}, null, (res)=>{
-        for (let cookie of res.headers['set-cookie'] || []) {
-            if (! cookie.match(/^MAJIANG=/)) continue;
-            cookie = cookie.replace(/^MAJIANG=/,'').replace(/; .*$/,'');
-            init(url, cookie, room);
+    post(url + '/auth/', { name: name, passwd: '*'}, (res)=>{
+        for (let c of res.headers['set-cookie'] || []) {
+            if (! c.match(/^MAJIANG=/)) continue;
+            cookie = c.replace(/^MAJIANG=/,'').replace(/; .*$/,'');
+            init(url, room);
+            break;
         }
     });
 }
 
-function logout(cookie) {
-    post(url + '/logout', '', cookie, ()=>{ process.exit() });
+function logout() {
+    post(url + '/logout', '', ()=>{ process.exit() });
 }
 
-function error(msg, cookie) {
+function error(msg) {
     console.log('ERROR:', msg);
-    logout(cookie);
+    logout();
 }
 
-function init(url, cookie, room) {
+function init(url, room) {
 
     const server = url.replace(/^(https?:\/\/[^\/]*)\/.*$/,'$1');
     const path   = url.replace(/^https?:\/\/[^\/]*/,'').replace(/\/$/,'');
@@ -62,9 +65,9 @@ function init(url, cookie, room) {
                     });
 
     if (argv.verbose) sock.onAny(console.log);
-    sock.on('ERROR', (msg)=>{ error(msg, cookie) });
-    sock.on('END',   ()   =>{ logout(cookie) });
-    sock.on('ROOM',  ()   =>{ sock.on('HELLO', ()=>{ logout(cookie) })});
+    sock.on('ERROR', error);
+    sock.on('END',   logout);
+    sock.on('ROOM',  ()=>{ sock.on('HELLO', logout)});
     sock.on('GAME',  (msg)=>{
         if (msg.seq) {
             player.action(msg, (reply = {})=>{
@@ -74,8 +77,8 @@ function init(url, cookie, room) {
         }
     });
 
-    process.on('SIGTERM', ()=>{ logout(cookie) });
-    process.on('SIGINT',  ()=>{ logout(cookie) });
+    process.on('SIGTERM', logout);
+    process.on('SIGINT',  logout);
 
     sock.emit('ROOM', room);
 }
