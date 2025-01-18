@@ -32,7 +32,6 @@ function login(url, name, room) {
         for (let cookie of res.headers['set-cookie'] || []) {
             if (! cookie.match(/^MAJIANG=/)) continue;
             cookie = cookie.replace(/^MAJIANG=/,'').replace(/; .*$/,'');
-            console.log('cookie:', cookie);
             init(url, cookie, room);
         }
     });
