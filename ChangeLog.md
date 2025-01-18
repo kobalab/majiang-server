@@ -1,3 +1,14 @@
+## v1.3.0 / 2025-01-18
+
+  - 麻雀ボット(majiang-bot)の機能を追加
+    - @kobalab/majiang-ai 1.0.13 をインストール
+    - soket.io-client 4.8.1 をインストール
+  - @kobalab/majiang-core 1.2.1 → 1.3.2
+  - パッケージを最新化
+    - express 4.21.0 → 4.21.2
+    - express-session 1.18.0 → 1.18.1
+    - socket.io 4.8.0 → 4.8.1
+
 ### v1.2.6 / 2024-11-10
 
   - session-file-store の出すログメッセージを抑止
