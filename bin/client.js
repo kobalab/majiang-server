@@ -90,10 +90,11 @@ function init(url, room) {
 const argv = require('yargs')
     .usage('Usage: $0 [ server-url ]')
     .option('name',     { alias: 'n', default: '*ボット*'})
-    .option('room',     { alias: 'r', demandOption: true })
+    .option('room',     { alias: 'r', type: 'string', demandOption: true })
     .option('verbose',  { alias: 'v', boolean: true })
     .argv;
 
 const url = (argv._[0] || 'http://127.0.0.1:4615/server').replace(/\/$/,'');
+const room = argv.room || '-';
 
-login(url, argv.name, argv.room);
+login(url, argv.name, room);
