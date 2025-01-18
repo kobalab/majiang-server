@@ -75,6 +75,9 @@ function init(url, room) {
                 sock.emit('GAME', reply);
             });
         }
+        else {
+            player.action(msg);
+        }
     });
 
     process.on('SIGTERM', logout);
