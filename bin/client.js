@@ -40,6 +40,7 @@ function login(url, name, room) {
             init(url, room);
             break;
         }
+        if (! cookie) console.log('接続エラー:', url);
     });
 }
 
