@@ -2,6 +2,8 @@
 
 "use strict";
 
+const agant = 'majiang-bot/1.3';
+
 const io = require('socket.io-client');
 
 const Player = require('@kobalab/majiang-ai');
@@ -13,7 +15,8 @@ function post(url, param, cookie, callback) {
 
     const req = http.request(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded',
+        headers: { 'User-Agent':   agant,
+                   'Content-Type': 'application/x-www-form-urlencoded',
                     Cookie:        `MAJIANG=${cookie}` }
     }, res =>{
         res.on('data', ()=>{});
@@ -53,6 +56,7 @@ function init(url, cookie, room) {
     const sock = io(server, {
                         path: `${path}/socket.io/`,
                         extraHeaders: {
+                            'User-Agent': agant,
                             Cookie: `MAJIANG=${cookie}`,
                         }
                     });
