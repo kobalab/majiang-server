@@ -35,6 +35,23 @@ $ npm i -g @kobalab/majiang-server
 
 **関連記事:** [麻雀サーバーの使い方](https://blog.kobalab.net/entry/2024/02/15/081605)
 
+### majiang-bot [ *options*... ] [ *server-url* ]
+麻雀サーバーにAIのボットを接続する。
+```bash
+$ majiang-bot -r A1234 -n '麻雀ロボ' https://kobalab.net/majiang/server
+```
+<dl>
+<dt>--room, -r</dt>
+    <dd>入室するルーム</dd>
+<dt>--name, -n</dt>
+    <dd>対局者名(デフォルトは <code>*ボット*</code>)</dd>
+<dt>--verbose, -v</dt>
+    <dd>標準出力にデバッグログを出力する</dd>
+<dt>server-url</dt>
+  <dd>麻雀サーバーのURL(デフォルトは <code>http://127.0.0.1:4615/server</code>)。<br>
+      デモサイトに接続するときは <code>https://kobalab.net/majiang/server</code> を指定すればよい。</dd>
+</dl>
+
 ## ライセンス
 [MIT](https://github.com/kobalab/majiang-server/blob/master/LICENSE)
 
