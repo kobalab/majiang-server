@@ -40,6 +40,7 @@ function login(url, name, room) {
             init(url, room);
             break;
         }
+        if (! cookie) console.log('接続エラー:', url);
     });
 }
 
@@ -75,6 +76,9 @@ function init(url, room) {
                 sock.emit('GAME', reply);
             });
         }
+        else {
+            player.action(msg);
+        }
     });
 
     process.on('SIGTERM', logout);
@@ -86,10 +90,11 @@ function init(url, room) {
 const argv = require('yargs')
     .usage('Usage: $0 [ server-url ]')
     .option('name',     { alias: 'n', default: '*ボット*'})
-    .option('room',     { alias: 'r', demandOption: true })
+    .option('room',     { alias: 'r', type: 'string', demandOption: true })
     .option('verbose',  { alias: 'v', boolean: true })
     .argv;
 
 const url = (argv._[0] || 'http://127.0.0.1:4615/server').replace(/\/$/,'');
+const room = argv.room || '-';
 
-login(url, argv.name, argv.room);
+login(url, argv.name, room);
