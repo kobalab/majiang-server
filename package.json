@@ -6,7 +6,8 @@
     "access": "public"
   },
   "bin": {
-    "majiang-server": "./bin/server.js"
+    "majiang-server": "./bin/server.js",
+    "majiang-bot": "./bin/client.js"
   },
   "scripts": {
     "start": "node bin/server.js"
