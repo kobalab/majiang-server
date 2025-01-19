@@ -11,41 +11,35 @@ const player = new Player();
 
 let cookie;
 
-function post(url, param, callback) {
-
-    const http = require(url.slice(0,5) == 'https' ? 'https' : 'http');
-
-    const req = http.request(url, {
-        method: 'POST',
-        headers: { 'User-Agent':   agant,
-                   'Content-Type': 'application/x-www-form-urlencoded',
-                    Cookie:        `MAJIANG=${cookie}` }
-    }, res =>{
-        res.on('data', ()=>{});
-        res.on('end',  ()=>callback(res));
-    }).on('error', err =>{
-        console.log(err.message);
-    });
-    req.write(new URLSearchParams(param).toString());
-    req.end();
-
-}
-
 function login(url, name, room) {
 
-    post(url + '/auth/', { name: name, passwd: '*'}, (res)=>{
-        for (let c of res.headers['set-cookie'] || []) {
+    fetch(url + '/auth/', {
+        method:   'POST',
+        headers:  { 'User-Agent': agant },
+        body:     new URLSearchParams({ name: name, passwd: '*'}),
+        redirect: 'manual'
+    }).then(res=>{
+        for (let c of (res.headers.get('Set-Cookie')||'').split(/,\s*/)) {
             if (! c.match(/^MAJIANG=/)) continue;
             cookie = c.replace(/^MAJIANG=/,'').replace(/; .*$/,'');
             init(url, room);
             break;
         }
-        if (! cookie) console.log('接続エラー:', url);
+        if (! cookie) console.log('ログインエラー:', url);
+    }).catch(err=>{
+        console.log('接続エラー:', url);
     });
 }
 
 function logout() {
-    post(url + '/logout', '', ()=>{ process.exit() });
+
+    fetch(url + '/logout', {
+        method:   'POST',
+        headers:  { 'User-Agent': agant,
+                    'Cookie':     `MAJIANG=${cookie}`},
+    }).then(res=>{
+        process.exit();
+    });
 }
 
 function error(msg) {
