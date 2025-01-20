@@ -3,7 +3,7 @@
 "use strict";
 
 const { version } = require('../package.json');
-const agent = 'majiang-bot/' + version.replace(/\.\d+$/,'');
+const agent = 'majiang-bot/' + version.replace(/^(\d+\.\d+).*$/,'$1');
 
 const io = require('socket.io-client');
 
