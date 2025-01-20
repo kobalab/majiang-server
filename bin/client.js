@@ -2,7 +2,8 @@
 
 "use strict";
 
-const agant = 'majiang-bot/1.3';
+const { version } = require('../package.json');
+const agent = 'majiang-bot/' + version.replace(/^(\d+\.\d+).*$/,'$1');
 
 const io = require('socket.io-client');
 
@@ -15,7 +16,7 @@ function login(url, name, room) {
 
     fetch(url + '/auth/', {
         method:   'POST',
-        headers:  { 'User-Agent': agant },
+        headers:  { 'User-Agent': agent },
         body:     new URLSearchParams({ name: name, passwd: '*'}),
         redirect: 'manual'
     }).then(res=>{
@@ -35,7 +36,7 @@ function logout() {
 
     fetch(url + '/logout', {
         method:   'POST',
-        headers:  { 'User-Agent': agant,
+        headers:  { 'User-Agent': agent,
                     'Cookie':     `MAJIANG=${cookie}`},
     }).then(res=>{
         process.exit();
@@ -54,7 +55,7 @@ function init(url, room) {
     const sock = io(server, {
                         path: `${path}/socket.io/`,
                         extraHeaders: {
-                            'User-Agent': agant,
+                            'User-Agent': agent,
                             Cookie: `MAJIANG=${cookie}`,
                         }
                     });

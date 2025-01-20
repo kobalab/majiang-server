@@ -1,3 +1,8 @@
+### v1.3.3 / 2025-01-20
+
+  - User-Agent のバージョンを package.json から取得するよう修正
+  - typo 修正: agant → agent
+
 ### v1.3.2 / 2025-01-19
 
   - HTTPクライアントを http/https から fetch に変更
