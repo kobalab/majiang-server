@@ -1,6 +1,6 @@
 {
   "name": "@kobalab/majiang-server",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "麻雀サーバー",
   "publishConfig": {
     "access": "public"
