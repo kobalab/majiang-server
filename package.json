@@ -10,6 +10,8 @@
     "majiang-bot": "./bin/client.js"
   },
   "scripts": {
+    "test": "mocha -u tdd",
+    "test:cover": "nyc -r lcov -r text npm test",
     "start": "node bin/server.js"
   },
   "repository": {
