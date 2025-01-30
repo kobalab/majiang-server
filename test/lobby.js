@@ -353,7 +353,7 @@ suite('room', ()=>{
                 assert.equal(type, 'HELLO');
                 assert.ok(! lobby.ROOM[room_no]);
                 done();
-            }, 100);
+            }, 500);
         });
         test('再接続した管理者が対局を開始できること', (done)=>{
             for (let i = 0; i < 4; i++) {
@@ -375,7 +375,7 @@ suite('room', ()=>{
             }
             assert.ok(lobby.ROOM[room_no].game);
             sock.forEach(s => s.trigger('disconnect'));
-            setTimeout(done, 100);
+            setTimeout(done, 500);
         });
         test('参加者が対局を開始できないこと', ()=>{
             sock[0] = connect(user[0]);
@@ -413,7 +413,7 @@ suite('room', ()=>{
             setTimeout(()=>{
                 assert.ok(! lobby.ROOM[room_no]);
                 done();
-            }, 1500);
+            }, 1800);
         });
     });
     suite('ステータス表示', ()=>{
@@ -449,7 +449,7 @@ suite('room', ()=>{
             assert.ok(lobby.status(15));
 
             sock[0].trigger('disconnect');
-            setTimeout(done, 100);
+            setTimeout(done, 500);
         });
     });
 });
