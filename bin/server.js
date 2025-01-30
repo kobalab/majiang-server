@@ -14,7 +14,6 @@ const argv = yargs
     .option('docroot',  { alias: 'd' })
     .option('oauth',    { alias: 'o' })
     .option('store',    { alias: 's' })
-    .option('verbose',  { alias: 'v', boolean: true })
     .argv;
 const port = argv.port;
 const base = ('' + argv.baseurl)
