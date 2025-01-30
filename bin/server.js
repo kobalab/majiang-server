@@ -76,12 +76,13 @@ const wrap = (middle_wear)=>
 
 const http = require('http').createServer(app);
 const io   = require('socket.io')(http, { path: `${base}/socket.io/` });
-const room = require('../lib/room');
 
 io.use(wrap(session));
 io.use(wrap(passport.initialize()));
 io.use(wrap(passport.session()));
-room(io, argv.verbose);
+
+const Lobby = require('../lib/lobby');
+const lobby = new Lobby(io);
 
 http.listen(port, ()=>{
     console.log(`Server start on http://127.0.0.1:${port}${base}/`);
