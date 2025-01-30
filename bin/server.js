@@ -67,6 +67,7 @@ app.post(`${base}/logout`, (req, res)=>{
     res.clearCookie('MAJIANG');
     res.redirect(302, back);
 });
+app.get(`${base}/status`, (req, res)=>res.send(lobby.status()));
 if (docs) app.use(express.static(docs));
 app.use((req, res)=>res.status(404).send('<h1>Not Found</h1>'));
 
