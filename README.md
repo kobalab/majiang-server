@@ -29,6 +29,8 @@ $ npm i -g @kobalab/majiang-server
     <dd>OAuth認証定義ファイルの配置ディレクトリ(省略可能)</dd>
 <dt>--store, -s</dt>
     <dd>セッションデータを保存するディレクトリ(省略可能)</dd>
+<dt>--status, -S</dt>
+    <dd><code>/server/status</code> でステータス表示を有効にする</dd>
 </dl>
 
 **関連記事:** [麻雀サーバーの使い方](https://blog.kobalab.net/entry/2024/02/15/081605)

@@ -14,6 +14,7 @@ const argv = yargs
     .option('docroot',  { alias: 'd' })
     .option('oauth',    { alias: 'o' })
     .option('store',    { alias: 's' })
+    .option('status',   { alias: 'S', boolean: true })
     .argv;
 const port = argv.port;
 const base = ('' + argv.baseurl)
@@ -22,6 +23,7 @@ const base = ('' + argv.baseurl)
 const back = argv.callback;
 const auth = argv.oauth && path.resolve(argv.oauth);
 const docs = argv.docroot && path.resolve(argv.docroot);
+const stat = argv.status;
 
 const express  = require('express');
 const store    = ! argv.store ? null
@@ -67,7 +69,9 @@ app.post(`${base}/logout`, (req, res)=>{
     res.clearCookie('MAJIANG');
     res.redirect(302, back);
 });
-app.get(`${base}/status`, (req, res)=>res.send(lobby.status()));
+if (stat) {
+    app.get(`${base}/status`, (req, res)=>res.send(lobby.status()));    
+}
 if (docs) app.use(express.static(docs));
 app.use((req, res)=>res.status(404).send('<h1>Not Found</h1>'));
 
