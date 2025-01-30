@@ -416,4 +416,40 @@ suite('room', ()=>{
             }, 1500);
         });
     });
+    suite('ステータス表示', ()=>{
+        const user = [
+            { uid:'user0@status', name:'ユーザ0', icon:'user0.png' },
+            { uid:'user1@status', name:'ユーザ1', icon:'user1.png' },
+            { uid:'user2@status', name:'ユーザ2', icon:'user2.png' },
+            { uid:'user3@status', name:'ユーザ3', icon:'user3.png' },
+            { uid:'user4@status', name:'ユーザ4', icon:'user4.png' },
+        ];
+        const sock = [];
+        let room_no, type, msg;
+        test('ステータスが表示できること', (done)=>{
+
+            for (let i = 0; i < 5; i++) {
+                sock[i] = connect(user[i]);
+            }
+
+            sock[0].trigger('ROOM');
+            [ type, msg ] = sock[0].emit_log();
+            room_no = msg.room_no;
+            sock[1].trigger('ROOM', room_no);
+            sock[0].trigger('START', room_no);
+            sock[1].trigger('disconnect');
+
+            sock[2].trigger('ROOM');
+            [ type, msg ] = sock[2].emit_log();
+            room_no = msg.room_no;
+            sock[3].trigger('ROOM', room_no);
+            sock[2].trigger('disconnect');
+
+            assert.ok(lobby.status());
+            assert.ok(lobby.status(15));
+
+            sock[0].trigger('disconnect');
+            setTimeout(done, 100);
+        });
+    });
 });
