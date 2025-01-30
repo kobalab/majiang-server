@@ -41,7 +41,12 @@ const session  = require('express-session')({
                             cookie: { maxAge: 1000*60*60*24*14 } });
 const passport = require('../lib/passport')(auth);
 
-const app = express();
+const app  = express();
+const http = require('http').createServer(app);
+const io   = require('socket.io')(http, { path: `${base}/socket.io/` });
+
+const lobby = require('../lib/lobby')(io);
+
 app.use(session);
 app.use(passport.initialize());
 app.use(passport.session());
@@ -79,14 +84,9 @@ app.use((req, res)=>res.status(404).send('<h1>Not Found</h1>'));
 const wrap = (middle_wear)=>
                     (socket, next)=> middle_wear(socket.request, {}, next);
 
-const http = require('http').createServer(app);
-const io   = require('socket.io')(http, { path: `${base}/socket.io/` });
-
 io.use(wrap(session));
 io.use(wrap(passport.initialize()));
 io.use(wrap(passport.session()));
-
-const lobby = require('../lib/lobby')(io);
 
 http.listen(port, ()=>{
     console.log(`Server start on http://127.0.0.1:${port}${base}/`);
