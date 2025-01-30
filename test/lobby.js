@@ -258,8 +258,7 @@ suite('Lobby', ()=>{
             sock[4].trigger('ROOM');
             let new_room_no = sock[4].emit_log()[1].room_no;
             sock[1].trigger('ROOM', new_room_no);
-            [ type, msg ] = sock[1].emit_log();
-            assert.equal(type, 'ERROR');
+            assert.equal(lobby.USER['user1@room'].room_no, room_no);
         });
         test('参加者による参加者の強制退室', ()=>{
             sock[2].trigger('ROOM', room_no, 'user3@room');
