@@ -1,6 +1,5 @@
 const assert  = require('assert');
 
-const Lobby = require('../lib/lobby');
 const { rule } = require('@kobalab/majiang-core');
 
 class Emitter {
@@ -70,8 +69,9 @@ console.log = ()=>{};
 suite('room', ()=>{
 
     let lobby;
-    test('モジュールが存在すること', ()=> assert.ok(Lobby));
-    test('モジュールが呼び出せること', ()=> assert.ok(lobby = new Lobby(io)));
+    test('モジュールが存在すること', ()=> assert.ok(require('../lib/lobby')));
+    test('モジュールが呼び出せること', ()=>
+                            assert.ok(lobby = require('../lib/lobby')(io)));
 
     suite('接続', ()=>{
         test('非ログインユーザを拒否すること', ()=>{
