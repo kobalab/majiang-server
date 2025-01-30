@@ -66,7 +66,7 @@ function connect(user) {
 
 console.log = ()=>{};
 
-suite('room', ()=>{
+suite('Lobby', ()=>{
 
     let lobby;
     test('モジュールが存在すること', ()=> assert.ok(require('../lib/lobby')));
