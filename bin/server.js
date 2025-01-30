@@ -70,7 +70,7 @@ app.post(`${base}/logout`, (req, res)=>{
     res.redirect(302, back);
 });
 if (stat) {
-    app.get(`${base}/status`, (req, res)=> 
+    app.get(`${base}/status`, (req, res)=>
         res.send(lobby.status(req.query.refresh)));
 }
 if (docs) app.use(express.static(docs));
@@ -86,8 +86,7 @@ io.use(wrap(session));
 io.use(wrap(passport.initialize()));
 io.use(wrap(passport.session()));
 
-const Lobby = require('../lib/lobby');
-const lobby = new Lobby(io);
+const lobby = require('../lib/lobby')(io);
 
 http.listen(port, ()=>{
     console.log(`Server start on http://127.0.0.1:${port}${base}/`);
