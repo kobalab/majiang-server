@@ -76,7 +76,7 @@ app.post(`${base}/logout`, (req, res)=>{
 });
 if (stat) {
     app.get(`${base}/status`, (req, res)=>
-        res.send(lobby.status(req.query.refresh)));
+        res.send(lobby.status(req.query.refresh, req.query.all)));
 }
 if (docs) app.use(express.static(docs));
 app.use((req, res)=>res.status(404).send('<h1>Not Found</h1>'));
