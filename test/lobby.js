@@ -313,6 +313,13 @@ suite('Lobby', ()=>{
             [ type, msg ] = sock[3].emit_log();
             assert.equal(type, 'ERROR');
         });
+        test('対局開始後は退室できないこと', ()=>{
+            sock[2].trigger('ROOM', room_no, 'user2@game');
+            [ type, msg ] = sock[2].emit_log();
+            assert.notEqual(type, 'HELLO');
+            assert.equal(lobby.USER['user2@game'].room_no, room_no);
+            assert.equal(lobby.ROOM[room_no].uids.length, 3);
+        });
         test('対局開始後に重複して開始できないこと', ()=>{
             sock[0].trigger('START', room_no, rule());
             assert.equal(sock[0]._emit_log.
