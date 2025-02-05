@@ -254,11 +254,15 @@ suite('Lobby', ()=>{
             }
             assert.equal(lobby.ROOM[room_no].uids.length, 4);
         });
+        test('入室済みの場合、ルームを作成できないこと', ()=>{
+            sock[1].trigger('ROOM');
+            assert.equal(lobby.USER['user1@room'].room_no, room_no);
+        });
         test('入室済みの場合、他のルームに入室できないこと', ()=>{
             sock[4].trigger('ROOM');
             let new_room_no = sock[4].emit_log()[1].room_no;
-            sock[1].trigger('ROOM', new_room_no);
-            assert.equal(lobby.USER['user1@room'].room_no, room_no);
+            sock[2].trigger('ROOM', new_room_no);
+            assert.equal(lobby.USER['user2@room'].room_no, room_no);
         });
         test('参加者による参加者の強制退室', ()=>{
             sock[2].trigger('ROOM', room_no, 'user3@room');
@@ -312,6 +316,13 @@ suite('Lobby', ()=>{
             sock[3].trigger('ROOM', room_no);
             [ type, msg ] = sock[3].emit_log();
             assert.equal(type, 'ERROR');
+        });
+        test('対局開始後は退室できないこと', ()=>{
+            sock[2].trigger('ROOM', room_no, 'user2@game');
+            [ type, msg ] = sock[2].emit_log();
+            assert.notEqual(type, 'HELLO');
+            assert.equal(lobby.USER['user2@game'].room_no, room_no);
+            assert.equal(lobby.ROOM[room_no].uids.length, 3);
         });
         test('対局開始後に重複して開始できないこと', ()=>{
             sock[0].trigger('START', room_no, rule());
@@ -449,6 +460,22 @@ suite('Lobby', ()=>{
 
             sock[0].trigger('disconnect');
             setTimeout(done, 500);
+        });
+    });
+    suite('例外処理', ()=>{
+        const CONSOLE_ERROR = console.error();
+        suiteSetup(()=>{
+            console.error = ()=>{};
+        });
+        test('ログ出力時の例外を捕捉すること', ()=>{
+            let sock = connect({ name: 'ゲスト' });
+            let [ type, msg ] = sock.emit_log();
+            sock.trigger('ROOM');
+            delete lobby.USER[msg.uid];
+            assert.ok(lobby.short_status());
+        });
+        suiteTeardown(()=>{
+            console.error = CONSOLE_ERROR;
         });
     });
 });
