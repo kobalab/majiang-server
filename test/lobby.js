@@ -462,4 +462,20 @@ suite('Lobby', ()=>{
             setTimeout(done, 500);
         });
     });
+    suite('例外処理', ()=>{
+        const CONSOLE_ERROR = console.error();
+        suiteSetup(()=>{
+            console.error = ()=>{};
+        });
+        test('ログ出力時の例外を捕捉すること', ()=>{
+            let sock = connect({ name: 'ゲスト' });
+            let [ type, msg ] = sock.emit_log();
+            sock.trigger('ROOM');
+            delete lobby.USER[msg.uid];
+            assert.ok(lobby.short_status());
+        });
+        suiteTeardown(()=>{
+            console.error = CONSOLE_ERROR;
+        });
+    });
 });
