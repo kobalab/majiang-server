@@ -254,11 +254,15 @@ suite('Lobby', ()=>{
             }
             assert.equal(lobby.ROOM[room_no].uids.length, 4);
         });
+        test('入室済みの場合、ルームを作成できないこと', ()=>{
+            sock[1].trigger('ROOM');
+            assert.equal(lobby.USER['user1@room'].room_no, room_no);
+        });
         test('入室済みの場合、他のルームに入室できないこと', ()=>{
             sock[4].trigger('ROOM');
             let new_room_no = sock[4].emit_log()[1].room_no;
-            sock[1].trigger('ROOM', new_room_no);
-            assert.equal(lobby.USER['user1@room'].room_no, room_no);
+            sock[2].trigger('ROOM', new_room_no);
+            assert.equal(lobby.USER['user2@room'].room_no, room_no);
         });
         test('参加者による参加者の強制退室', ()=>{
             sock[2].trigger('ROOM', room_no, 'user3@room');
