@@ -161,6 +161,7 @@ suite('Lobby', ()=>{
                             Object.assign({}, user[0], { offline: true }));
             assert.deepEqual(lobby.ROOM[room_no].uids,
                              [ 'admin@room','user1@room' ]);
+            assert.ok(lobby.ROOM[room_no].exptime);
             assert.equal(lobby.USER['admin@room'].room_no, room_no);
             assert.ok(! lobby.USER['admin@room'].sock);
         });
@@ -185,6 +186,7 @@ suite('Lobby', ()=>{
             assert.ok(msg.room_no);
             assert.deepEqual(msg.user[0],
                             Object.assign({}, user[0], { offline: false }));
+            assert.ok(! lobby.ROOM[room_no].exptime);
             assert.ok(lobby.USER['admin@room'].sock);
         });
         test('参加者が再接続してもルームに戻らないこと', ()=>{
@@ -279,6 +281,16 @@ suite('Lobby', ()=>{
         });
         test('存在しないルームの強制退室', ()=>{
             sock[0].trigger('ROOM', 'badroom', 'admin@room');
+        });
+        test('管理者不在のルームを削除すること', ()=>{
+            sock[0].trigger('disconnect');
+            lobby.cleanup_room();
+            assert.ok(lobby.ROOM[room_no].exptime);
+            lobby.ROOM[room_no].exptime = -1;
+            lobby.cleanup_room();
+            assert.ok(! lobby.USER['admin@room']);
+            assert.ok(! lobby.USER['user1@room'].room_no);
+            assert.ok(! lobby.ROOM[room_no]);
         });
     });
     suite('ゲーム', ()=>{
