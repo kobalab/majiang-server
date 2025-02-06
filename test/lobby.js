@@ -420,10 +420,12 @@ suite('Lobby', ()=>{
             sock[0].trigger('START', room_no,
                             rule({ '場数': 1, "連荘方式": 0, "延長戦方式": 0 }));
             lobby.ROOM[room_no].game.speed = 0;
-            setTimeout(()=>{
+            const callback = lobby.ROOM[room_no].game._callback;
+            lobby.ROOM[room_no].game._callback = (paipu)=>{
+                callback(paipu);
                 assert.ok(! lobby.ROOM[room_no]);
                 done();
-            }, 1800);
+            };
         });
     });
     suite('ステータス表示', ()=>{
