@@ -368,14 +368,17 @@ suite('Lobby', ()=>{
             assert.ok(msg.players);
         });
         test('全員の切断で対局が終了すること', (done)=>{
-            sock.forEach(s => s.trigger('disconnect'));
-            setTimeout(()=>{
+            assert.ok(lobby.ROOM[room_no].game);
+            const callback = lobby.ROOM[room_no].game._callback;
+            lobby.ROOM[room_no].game._callback = (paipu)=>{
+                callback(paipu);
                 sock[0] = connect(user[0]);
                 [ type, msg ] = sock[0].emit_log();
                 assert.equal(type, 'HELLO');
                 assert.ok(! lobby.ROOM[room_no]);
                 done();
-            }, 500);
+            };
+            sock.forEach(s => s.trigger('disconnect'));
         });
         test('再接続した管理者が対局を開始できること', (done)=>{
             for (let i = 0; i < 4; i++) {
@@ -396,8 +399,12 @@ suite('Lobby', ()=>{
                 assert.ok(msg.kaiju);
             }
             assert.ok(lobby.ROOM[room_no].game);
+            const callback = lobby.ROOM[room_no].game._callback;
+            lobby.ROOM[room_no].game._callback = (paipu)=>{
+                callback(paipu);
+                done();
+            };
             sock.forEach(s => s.trigger('disconnect'));
-            setTimeout(done, 500);
         });
         test('参加者が対局を開始できないこと', ()=>{
             sock[0] = connect(user[0]);
@@ -440,7 +447,7 @@ suite('Lobby', ()=>{
             };
         });
     });
-    suite('ステータス表示', ()=>{
+    suite('ステータス表示', (done)=>{
         const user = [
             { uid:'user0@status', name:'ユーザ0', icon:'user0.png' },
             { uid:'user1@status', name:'ユーザ1', icon:'user1.png' },
@@ -461,6 +468,7 @@ suite('Lobby', ()=>{
             room_no = msg.room_no;
             sock[1].trigger('ROOM', room_no);
             sock[0].trigger('START', room_no);
+            lobby.ROOM[room_no].game._callback = done;
             sock[1].trigger('disconnect');
 
             sock[2].trigger('ROOM');
@@ -473,7 +481,6 @@ suite('Lobby', ()=>{
             assert.ok(lobby.status(15));
 
             sock[0].trigger('disconnect');
-            setTimeout(done, 500);
         });
     });
     suite('例外処理', ()=>{
