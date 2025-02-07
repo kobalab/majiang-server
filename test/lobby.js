@@ -454,12 +454,13 @@ suite('Lobby', ()=>{
             { uid:'user2@status', name:'ユーザ2', icon:'user2.png' },
             { uid:'user3@status', name:'ユーザ3', icon:'user3.png' },
             { uid:'user4@status', name:'ユーザ4', icon:'user4.png' },
+            { uid:'user5@status', name:'ユーザ5', icon:'user5.png' },
         ];
         const sock = [];
         let room_no, type, msg;
         test('ステータスが表示できること', (done)=>{
 
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < user.length; i++) {
                 sock[i] = connect(user[i]);
             }
 
@@ -477,8 +478,19 @@ suite('Lobby', ()=>{
             sock[3].trigger('ROOM', room_no);
             sock[2].trigger('disconnect');
 
+            sock[4].trigger('ROOM');
+            sock[4].trigger('disconnect');
+
             assert.ok(lobby.status());
             assert.ok(lobby.status(15));
+            assert.ok(lobby.status(15, ''));
+            assert.ok(lobby.status(15, '', ''));
+
+            lobby._start_date -= 1000*60*60*24*6;
+            assert.ok(lobby.status());
+
+            lobby._start_date -= 1000*60*60*24;
+            assert.ok(lobby.status());
 
             sock[0].trigger('disconnect');
         });
