@@ -2,7 +2,7 @@
 
 麻雀サーバー
 
-WebSocket(socket.io)による麻雀サーバーの実装です。
+WebSocket(Socket.IO)による麻雀サーバーの実装です。
 [電脳麻将](https://github.com/kobalab/Majiang) ver.2.3.0 で追加したネット対戦は、本サーバーに接続して実現しています。
 
 ## デモ
