@@ -39,6 +39,7 @@ class Socket extends Emitter {
         if (user) {
             this.request.user      = user;
             this.request.sessionID = sessionID();
+            this.request.session = { cookie: { expires: new Date() } };
         }
     }
     disconnect(flag) {
@@ -161,6 +162,7 @@ suite('Lobby', ()=>{
                             Object.assign({}, user[0], { offline: true }));
             assert.deepEqual(lobby.ROOM[room_no].uids,
                              [ 'admin@room','user1@room' ]);
+            assert.ok(! lobby.ROOM[room_no].exptime);
             assert.equal(lobby.USER['admin@room'].room_no, room_no);
             assert.ok(! lobby.USER['admin@room'].sock);
         });
@@ -185,6 +187,7 @@ suite('Lobby', ()=>{
             assert.ok(msg.room_no);
             assert.deepEqual(msg.user[0],
                             Object.assign({}, user[0], { offline: false }));
+            assert.ok(! lobby.ROOM[room_no].exptime);
             assert.ok(lobby.USER['admin@room'].sock);
         });
         test('参加者が再接続してもルームに戻らないこと', ()=>{
@@ -280,6 +283,22 @@ suite('Lobby', ()=>{
         test('存在しないルームの強制退室', ()=>{
             sock[0].trigger('ROOM', 'badroom', 'admin@room');
         });
+        test('管理者不在のルームを削除すること', ()=>{
+            sock[0].trigger('disconnect');
+            sock[5] = connect({ name:'ゲスト'});
+            sock[5].trigger('ROOM');
+            let new_room_no = lobby.USER[sock[5].request.user.uid].room_no;
+            sock[6] = connect({ name:'ゲスト'});
+            sock[6].trigger('ROOM', new_room_no);
+            sock[5].trigger('disconnect');
+            lobby.cleanup_room();
+            assert.ok(lobby.ROOM[new_room_no].exptime);
+            lobby.ROOM[new_room_no].exptime = -1;
+            lobby.cleanup_room();
+            assert.ok(! lobby.USER[sock[5].request.user.uid]);
+            assert.ok(! lobby.USER[sock[6].request.user.uid].room_no);
+            assert.ok(! lobby.ROOM[new_room_no]);
+        });
     });
     suite('ゲーム', ()=>{
         const user = [
@@ -356,14 +375,17 @@ suite('Lobby', ()=>{
             assert.ok(msg.players);
         });
         test('全員の切断で対局が終了すること', (done)=>{
-            sock.forEach(s => s.trigger('disconnect'));
-            setTimeout(()=>{
+            assert.ok(lobby.ROOM[room_no].game);
+            const callback = lobby.ROOM[room_no].game._callback;
+            lobby.ROOM[room_no].game._callback = (paipu)=>{
+                callback(paipu);
                 sock[0] = connect(user[0]);
                 [ type, msg ] = sock[0].emit_log();
                 assert.equal(type, 'HELLO');
                 assert.ok(! lobby.ROOM[room_no]);
                 done();
-            }, 500);
+            };
+            sock.forEach(s => s.trigger('disconnect'));
         });
         test('再接続した管理者が対局を開始できること', (done)=>{
             for (let i = 0; i < 4; i++) {
@@ -384,8 +406,12 @@ suite('Lobby', ()=>{
                 assert.ok(msg.kaiju);
             }
             assert.ok(lobby.ROOM[room_no].game);
+            const callback = lobby.ROOM[room_no].game._callback;
+            lobby.ROOM[room_no].game._callback = (paipu)=>{
+                callback(paipu);
+                done();
+            };
             sock.forEach(s => s.trigger('disconnect'));
-            setTimeout(done, 500);
         });
         test('参加者が対局を開始できないこと', ()=>{
             sock[0] = connect(user[0]);
@@ -420,25 +446,27 @@ suite('Lobby', ()=>{
             sock[0].trigger('START', room_no,
                             rule({ '場数': 1, "連荘方式": 0, "延長戦方式": 0 }));
             lobby.ROOM[room_no].game.speed = 0;
-            setTimeout(()=>{
+            const callback = lobby.ROOM[room_no].game._callback;
+            lobby.ROOM[room_no].game._callback = (paipu)=>{
+                callback(paipu);
                 assert.ok(! lobby.ROOM[room_no]);
                 done();
-            }, 1800);
+            };
         });
     });
-    suite('ステータス表示', ()=>{
+    suite('ステータス表示', (done)=>{
         const user = [
             { uid:'user0@status', name:'ユーザ0', icon:'user0.png' },
             { uid:'user1@status', name:'ユーザ1', icon:'user1.png' },
             { uid:'user2@status', name:'ユーザ2', icon:'user2.png' },
             { uid:'user3@status', name:'ユーザ3', icon:'user3.png' },
-            { uid:'user4@status', name:'ユーザ4', icon:'user4.png' },
+            { name:'ユーザ5' },
         ];
         const sock = [];
         let room_no, type, msg;
         test('ステータスが表示できること', (done)=>{
 
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < user.length; i++) {
                 sock[i] = connect(user[i]);
             }
 
@@ -447,6 +475,7 @@ suite('Lobby', ()=>{
             room_no = msg.room_no;
             sock[1].trigger('ROOM', room_no);
             sock[0].trigger('START', room_no);
+            lobby.ROOM[room_no].game._callback = done;
             sock[1].trigger('disconnect');
 
             sock[2].trigger('ROOM');
@@ -455,11 +484,21 @@ suite('Lobby', ()=>{
             sock[3].trigger('ROOM', room_no);
             sock[2].trigger('disconnect');
 
+            sock[4].trigger('ROOM');
+            sock[4].trigger('disconnect');
+
             assert.ok(lobby.status());
             assert.ok(lobby.status(15));
+            assert.ok(lobby.status(15, ''));
+            assert.ok(lobby.status(15, '', ''));
+
+            lobby._start_date -= 1000*60*60*24*6;
+            assert.ok(lobby.status());
+
+            lobby._start_date -= 1000*60*60*24;
+            assert.ok(lobby.status());
 
             sock[0].trigger('disconnect');
-            setTimeout(done, 500);
         });
     });
     suite('例外処理', ()=>{
