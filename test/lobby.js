@@ -39,6 +39,7 @@ class Socket extends Emitter {
         if (user) {
             this.request.user      = user;
             this.request.sessionID = sessionID();
+            this.request.session = { cookie: { expires: new Date() } };
         }
     }
     disconnect(flag) {
@@ -161,7 +162,7 @@ suite('Lobby', ()=>{
                             Object.assign({}, user[0], { offline: true }));
             assert.deepEqual(lobby.ROOM[room_no].uids,
                              [ 'admin@room','user1@room' ]);
-            assert.ok(lobby.ROOM[room_no].exptime);
+            assert.ok(! lobby.ROOM[room_no].exptime);
             assert.equal(lobby.USER['admin@room'].room_no, room_no);
             assert.ok(! lobby.USER['admin@room'].sock);
         });
@@ -284,13 +285,19 @@ suite('Lobby', ()=>{
         });
         test('管理者不在のルームを削除すること', ()=>{
             sock[0].trigger('disconnect');
+            sock[5] = connect({ name:'ゲスト'});
+            sock[5].trigger('ROOM');
+            let new_room_no = lobby.USER[sock[5].request.user.uid].room_no;
+            sock[6] = connect({ name:'ゲスト'});
+            sock[6].trigger('ROOM', new_room_no);
+            sock[5].trigger('disconnect');
             lobby.cleanup_room();
-            assert.ok(lobby.ROOM[room_no].exptime);
-            lobby.ROOM[room_no].exptime = -1;
+            assert.ok(lobby.ROOM[new_room_no].exptime);
+            lobby.ROOM[new_room_no].exptime = -1;
             lobby.cleanup_room();
-            assert.ok(! lobby.USER['admin@room']);
-            assert.ok(! lobby.USER['user1@room'].room_no);
-            assert.ok(! lobby.ROOM[room_no]);
+            assert.ok(! lobby.USER[sock[5].request.user.uid]);
+            assert.ok(! lobby.USER[sock[6].request.user.uid].room_no);
+            assert.ok(! lobby.ROOM[new_room_no]);
         });
     });
     suite('ゲーム', ()=>{
@@ -453,8 +460,7 @@ suite('Lobby', ()=>{
             { uid:'user1@status', name:'ユーザ1', icon:'user1.png' },
             { uid:'user2@status', name:'ユーザ2', icon:'user2.png' },
             { uid:'user3@status', name:'ユーザ3', icon:'user3.png' },
-            { uid:'user4@status', name:'ユーザ4', icon:'user4.png' },
-            { uid:'user5@status', name:'ユーザ5', icon:'user5.png' },
+            { name:'ユーザ5' },
         ];
         const sock = [];
         let room_no, type, msg;
