@@ -7,9 +7,6 @@ const agent = 'majiang-bot/' + version.replace(/^(\d+\.\d+).*$/,'$1');
 
 const io = require('socket.io-client');
 
-const Player = require('@kobalab/majiang-ai');
-const player = new Player();
-
 let cookie;
 
 function login(url, name, room) {
@@ -86,10 +83,15 @@ const argv = require('yargs')
     .usage('Usage: $0 [ server-url ]')
     .option('name',     { alias: 'n', default: '*ボット*'})
     .option('room',     { alias: 'r', type: 'string', demandOption: true })
+    .option('legacy',   { alias: 'l', type: 'string' })
     .option('verbose',  { alias: 'v', boolean: true })
     .argv;
 
 const url = (argv._[0] || 'http://127.0.0.1:4615/server').replace(/\/$/,'');
 const room = argv.room || '-';
+
+const Player = argv.legacy ? require('@kobalab/majiang-ai/legacy')(argv.legacy)
+                           : require('@kobalab/majiang-ai');
+const player = new Player();
 
 login(url, argv.name, room);
