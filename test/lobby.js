@@ -502,7 +502,7 @@ suite('Lobby', ()=>{
         });
     });
     suite('例外処理', ()=>{
-        const CONSOLE_ERROR = console.error();
+        const CONSOLE_ERROR = console.error;
         suiteSetup(()=>{
             console.error = ()=>{};
         });
