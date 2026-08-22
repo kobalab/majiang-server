@@ -45,6 +45,8 @@ $ majiang-bot -r A1234 -n '麻雀ロボ' https://kobalab.net/majiang/server
     <dd>入室するルーム</dd>
 <dt>--name, -n</dt>
     <dd>対局者名(デフォルトは <code>*ボット*</code>)</dd>
+<dt>--legacy, -l</dt>
+    <dd>対局者の <a href="https://github.com/kobalab/majiang-ai/blob/master/legacy/README.md">思考アルゴリズム</a> を指定する(デフォルトは最新アルゴリズム)</dd>
 <dt>--verbose, -v</dt>
     <dd>標準出力にデバッグログを出力する</dd>
 <dt>server-url</dt>

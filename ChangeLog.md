@@ -1,3 +1,29 @@
+## v1.5.0 / 2026-08-22
+
+  - SIGTERM受信時に graceful shutdown するよう修正
+  - ボットが過去のAIを使用できるよう修正
+  - @kobalab/majiang-ai 1.1.0 → 1.2.0
+    - 過去のAIを導入するインタフェースを追加
+  - パッケージを最新化
+    - mocha 11.7.1 → 11.8.0
+    - nyc 17.1.0 → 18.0.0
+    - express 4.21.2 → 4.22.2
+    - express-session 1.18.2 → 1.19.0
+    - socket.io 4.8.1 → 4.8.3
+    - socket.io-client 4.8.1 → 4.8.3
+    - yargs 17.7.2 → 17.7.3
+  - 脆弱性警告に対処
+    - @babel/core 7.26.7 → 7.29.7
+    - bn.js 4.12.0 → 4.12.5
+    - brace-expansion 2.0.2 → 2.1.4
+    - engine.io 6.6.2 → 6.6.9
+    - glob 10.4.5 → 10.5.0
+    - js-yaml 3.14.1, 4.1.0 → 3.15.1, 4.3.1
+    - minimatch 9.0.5 → 9.0.9
+    - path-to-regexp 0.1.12 → 0.1.13
+    - socket.io-parser 4.2.4 → 4.2.7
+    - ws 8.17.1 → 8.21.3
+
 ### v1.4.5 / 2025-07-29
 
   - @kobalab/majiang-ai 1.0.13 → 1.1.0
