@@ -60,7 +60,8 @@ function init(url, room) {
     if (argv.verbose) sock.onAny(console.log);
     sock.on('ERROR', error);
     sock.on('END',   logout);
-    sock.on('ROOM',  ()=>{ sock.on('HELLO', logout)});
+    sock.on('ROOM',  ()=> sock.on('HELLO', logout));
+    sock.on('START', ()=> sock.off('ERROR'));
     sock.on('GAME',  (msg)=>{
         if (msg.seq) {
             player.action(msg, (reply = {})=>{
