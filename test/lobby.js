@@ -57,13 +57,15 @@ class Socket extends Emitter {
     }
 }
 
-const io = new Emitter();
-
-function connect(user) {
-    let sock = new Socket(user);
-    io.trigger('connection', sock);
-    return sock;
+class IO extends Emitter {
+    connect(user) {
+        let sock = new Socket(user);
+        this.trigger('connection', sock);
+        return sock;
+    }
 }
+
+const io = new IO();
 
 console.log = ()=>{};
 
@@ -76,11 +78,11 @@ suite('Lobby', ()=>{
 
     suite('接続', ()=>{
         test('非ログインユーザを拒否すること', ()=>{
-            const sock = connect();
+            const sock = io.connect();
             assert.ok(sock._dissconect);
         });
         test('ゲスト認証にuidを払い出すこと', ()=>{
-            const sock = connect({ name: 'ゲスト' });
+            const sock = io.connect({ name: 'ゲスト' });
             let [ type, msg ] = sock.emit_log();
             assert.equal(type, 'HELLO');
             assert.equal(msg.name, 'ゲスト');
@@ -91,7 +93,7 @@ suite('Lobby', ()=>{
         });
         test('外部認証を許可すること', ()=>{
             const user = { uid:'user@hatena', name:'はてな', icon:'icon.png' };
-            const sock = connect(user);
+            const sock = io.connect(user);
             let [ type, msg ] = sock.emit_log();
             assert.equal(type, 'HELLO');
             assert.deepEqual(msg, user);
@@ -99,9 +101,9 @@ suite('Lobby', ()=>{
             assert.ok(lobby.USER['user@hatena'].sock);
         });
         test('二重接続を拒否すること', ()=>{
-            let sock = connect({ name:'ゲスト' });
+            let sock = io.connect({ name:'ゲスト' });
             let [ type, msg ] = sock.emit_log();
-            sock = connect({ name:'二重接続', uid: msg.uid });
+            sock = io.connect({ name:'二重接続', uid: msg.uid });
             assert.ok(sock._dissconect);
             assert.deepEqual(lobby.USER[msg.uid].user,
                              { uid: msg.uid, name: 'ゲスト' });
@@ -109,9 +111,9 @@ suite('Lobby', ()=>{
         });
         test('再接続を許可すること', ()=>{
             const user = { uid:'user1@connect', name:'再接続', icon:'icon.png' };
-            let sock = connect(user);
+            let sock = io.connect(user);
             sock.trigger('disconnect');
-            sock = connect(user);
+            sock = io.connect(user);
             let [ type, msg ] = sock.emit_log();
             assert.equal(type, 'HELLO');
             assert.deepEqual(msg, user);
@@ -130,7 +132,7 @@ suite('Lobby', ()=>{
         const sock = [];
         let room_no, type, msg;
         test('作成できること', ()=>{
-            sock[0] = connect(user[0]);
+            sock[0] = io.connect(user[0]);
             sock[0].trigger('ROOM');
             [ type, msg ] = sock[0].emit_log();
             assert.equal(type, 'ROOM');
@@ -142,7 +144,7 @@ suite('Lobby', ()=>{
             assert.equal(lobby.USER['admin@room'].room_no, room_no);
         });
         test('入室できること', ()=>{
-            sock[1] = connect(user[1]);
+            sock[1] = io.connect(user[1]);
             sock[1].trigger('ROOM', room_no);
             [ type, msg ] = sock[1].emit_log();
             assert.equal(type, 'ROOM');
@@ -167,7 +169,7 @@ suite('Lobby', ()=>{
             assert.ok(! lobby.USER['admin@room'].sock);
         });
         test('参加者が切断すると退室すること', ()=>{
-            sock[2] = connect(user[2]);
+            sock[2] = io.connect(user[2]);
             sock[2].trigger('ROOM', room_no);
             assert.deepEqual(lobby.ROOM[room_no].uids,
                              [ 'admin@room','user1@room','user2@room' ]);
@@ -181,7 +183,7 @@ suite('Lobby', ()=>{
             assert.ok(! lobby.USER['user2@room']);
         });
         test('管理者が再接続するとルームに戻ること', ()=>{
-            sock[0] = connect(user[0]);
+            sock[0] = io.connect(user[0]);
             [ type, msg ] = sock[1].emit_log();
             assert.equal(type, 'ROOM');
             assert.ok(msg.room_no);
@@ -191,7 +193,7 @@ suite('Lobby', ()=>{
             assert.ok(lobby.USER['admin@room'].sock);
         });
         test('参加者が再接続してもルームに戻らないこと', ()=>{
-            sock[2] = connect(user[2]);
+            sock[2] = io.connect(user[2]);
             [ type, msg ] = sock[2].emit_log();
             assert.equal(type, 'HELLO');
             assert.deepEqual(lobby.ROOM[room_no].uids,
@@ -241,7 +243,7 @@ suite('Lobby', ()=>{
         });
         test('満室のルームに入室できないこと', ()=>{
             for (let i = 0; i < 5; i++) {
-                if (! sock[i]) sock[i] = connect(user[i]);
+                if (! sock[i]) sock[i] = io.connect(user[i]);
                 if (i == 0) {
                     sock[i].trigger('ROOM');
                     [ type, msg ] = sock[i].emit_log();
@@ -285,10 +287,10 @@ suite('Lobby', ()=>{
         });
         test('管理者不在のルームを削除すること', ()=>{
             sock[0].trigger('disconnect');
-            sock[5] = connect({ name:'ゲスト'});
+            sock[5] = io.connect({ name:'ゲスト'});
             sock[5].trigger('ROOM');
             let new_room_no = lobby.USER[sock[5].request.user.uid].room_no;
-            sock[6] = connect({ name:'ゲスト'});
+            sock[6] = io.connect({ name:'ゲスト'});
             sock[6].trigger('ROOM', new_room_no);
             sock[5].trigger('disconnect');
             lobby.cleanup_room();
@@ -312,7 +314,7 @@ suite('Lobby', ()=>{
         let room_no, type, msg;
         test('対局を開始できること', ()=>{
             for (let i = 0; i < 3; i++) {
-                sock[i] = connect(user[i]);
+                sock[i] = io.connect(user[i]);
                 if (i == 0) { sock[i].trigger('ROOM');
                               [ type, msg ] = sock[i].emit_log();
                               room_no = msg.room_no; }
@@ -331,7 +333,7 @@ suite('Lobby', ()=>{
             assert.ok(lobby.ROOM[room_no].game);
         });
         test('対局開始後は入室できないこと', ()=>{
-            sock[3] = connect(user[3]);
+            sock[3] = io.connect(user[3]);
             sock[3].trigger('ROOM', room_no);
             [ type, msg ] = sock[3].emit_log();
             assert.equal(type, 'ERROR');
@@ -358,7 +360,7 @@ suite('Lobby', ()=>{
             assert.ok(! lobby.USER['user1@game'].sock);
         });
         test('再接続で対局が再開できること', ()=>{
-            sock[1] = connect(user[1]);
+            sock[1] = io.connect(user[1]);
             assert.equal(lobby.USER['user1@game'].room_no, room_no);
             assert.ok(lobby.USER['user1@game'].sock);
             [ type, msg ] = sock[0].emit_log();
@@ -379,7 +381,7 @@ suite('Lobby', ()=>{
             const callback = lobby.ROOM[room_no].game._callback;
             lobby.ROOM[room_no].game._callback = (paipu)=>{
                 callback(paipu);
-                sock[0] = connect(user[0]);
+                sock[0] = io.connect(user[0]);
                 [ type, msg ] = sock[0].emit_log();
                 assert.equal(type, 'HELLO');
                 assert.ok(! lobby.ROOM[room_no]);
@@ -392,11 +394,11 @@ suite('Lobby', ()=>{
                 if (i == 0) { sock[i].trigger('ROOM');
                               [ type, msg ] = sock[i].emit_log();
                               room_no = msg.room_no; }
-                else        { sock[i] = connect(user[i]);
+                else        { sock[i] = io.connect(user[i]);
                               sock[i].trigger('ROOM', room_no); }
             }
             sock[0].trigger('disconnect');
-            sock[0] = connect(user[0]);
+            sock[0] = io.connect(user[0]);
             sock[0].trigger('START', room_no, rule());
             for (let i = 0; i < 4; i++) {
                 assert.equal(sock[i]._emit_log.
@@ -414,18 +416,18 @@ suite('Lobby', ()=>{
             sock.forEach(s => s.trigger('disconnect'));
         });
         test('参加者が対局を開始できないこと', ()=>{
-            sock[0] = connect(user[0]);
+            sock[0] = io.connect(user[0]);
             sock[0].trigger('ROOM');
             [ type, msg ] = sock[0].emit_log();
             room_no = msg.room_no;
-            sock[1] = connect(user[1]);
+            sock[1] = io.connect(user[1]);
             sock[1].trigger('ROOM', room_no);
             sock[1].trigger('START', room_no);
             assert.ok(! sock[1]._emit_log.find(log => log[0] == 'START'));
             assert.ok(! lobby.ROOM[room_no].game);
         });
         test('他のルームの対局を開始できないこと', ()=>{
-            sock[4] = connect(user[4]);
+            sock[4] = io.connect(user[4]);
             sock[4].trigger('ROOM');
             let new_room_no = sock[4].emit_log()[1].room_no;
             sock[0].trigger('START', new_room_no);
@@ -440,7 +442,7 @@ suite('Lobby', ()=>{
                 if (i == 0) { sock[i].trigger('ROOM');
                               [ type, msg ] = sock[i].emit_log();
                               room_no = msg.room_no; }
-                else        { sock[i] = connect(user[i]);
+                else        { sock[i] = io.connect(user[i]);
                               sock[i].trigger('ROOM', room_no); }
             }
             sock[0].trigger('START', room_no,
@@ -467,7 +469,7 @@ suite('Lobby', ()=>{
         test('ステータスが表示できること', (done)=>{
 
             for (let i = 0; i < user.length; i++) {
-                sock[i] = connect(user[i]);
+                sock[i] = io.connect(user[i]);
             }
 
             sock[0].trigger('ROOM');
@@ -507,7 +509,7 @@ suite('Lobby', ()=>{
             console.error = ()=>{};
         });
         test('ログ出力時の例外を捕捉すること', ()=>{
-            let sock = connect({ name: 'ゲスト' });
+            let sock = io.connect({ name: 'ゲスト' });
             let [ type, msg ] = sock.emit_log();
             sock.trigger('ROOM');
             delete lobby.USER[msg.uid];
