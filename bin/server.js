@@ -95,3 +95,12 @@ http.listen(port, ()=>{
     console.log('' + e);
     process.exit(-1);
 });
+
+process.on('SIGTERM', ()=>{
+    lobby.close(()=>{
+        setTimeout(()=>{
+            console.log('** closed!');
+            process.exit();
+        }, 5000);
+    });
+});

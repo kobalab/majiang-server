@@ -519,4 +519,67 @@ suite('Lobby', ()=>{
             console.error = CONSOLE_ERROR;
         });
     });
+    suite('予閉塞処理', ()=>{
+        const user = [
+            { uid:'user0@close', name:'ユーザ0', icon:'user0.png' },
+            { uid:'user1@close', name:'ユーザ1', icon:'user1.png' },
+            { uid:'user2@close', name:'ユーザ2', icon:'user2.png' },
+            { uid:'user3@close', name:'ユーザ3', icon:'user3.png' },
+            { uid:'user4@close', name:'ユーザ4', icon:'user4.png' },
+        ];
+        const sock = [];
+        let room_no, type, msg;
+        test('対局中の卓あり', (done)=>{
+            const io = new IO();
+            const lobby = require('../lib/lobby')(io);
+            for (let i = 0; i < user.length; i++) {
+                sock[i] = io.connect(user[i]);
+            }
+
+            sock[1].trigger('ROOM');
+            [ type, msg ] = sock[1].emit_log();
+            room_no = msg.room_no;
+            sock[1].trigger('disconnect');
+
+            sock[2].trigger('ROOM', room_no);
+
+            sock[3].trigger('ROOM');
+            [ type, msg ] = sock[3].emit_log();
+            room_no = msg.room_no;
+            sock[3].trigger('START', room_no,
+                            rule({ '場数': 1, "連荘方式": 0, "延長戦方式": 0 }));
+            lobby.ROOM[room_no].game.speed = 0;
+
+            sock[4].trigger('ROOM');
+            [ type, msg ] = sock[4].emit_log();
+            room_no = msg.room_no;
+            sock[4].trigger('START', room_no,
+                            rule({ '場数': 1, "連荘方式": 0, "延長戦方式": 0 }));
+            lobby.ROOM[room_no].game.speed = 0;
+
+            assert.equal(Object.keys(lobby.ROOM).length, 3);
+
+            lobby.close(()=>{
+                assert.equal(Object.keys(lobby.ROOM).length, 0);
+                done();
+            });
+
+            lobby.status();
+            assert.equal(Object.keys(lobby.ROOM).length, 2);
+
+            sock[1] = io.connect(user[1]);
+            sock[1].trigger('ROOM');
+        });
+        test('対局中の卓なし', (done)=>{
+            const io = new IO();
+            const lobby = require('../lib/lobby')(io);
+            lobby.close(done);
+        });
+        test('重複実行', (done)=>{
+            const io = new IO();
+            const lobby = require('../lib/lobby')(io);
+            lobby.close(done);
+            lobby.close(done);
+        });
+    });
 });
