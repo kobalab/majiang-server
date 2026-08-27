@@ -33,7 +33,7 @@ const store    = ! argv.store ? null
                               logFn: ()=>{} });
 const session  = require('express-session')({
                             name:   'MAJIANG',
-                            secret: 'keyboard cat',
+                            secret: require('../lib/secret')(argv.store),
                             resave: false,
                             saveUninitialized: false,
                             store:  store,
