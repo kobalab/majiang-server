@@ -1,3 +1,8 @@
+## v1.6.0 / 2026-08-27
+
+  - express-session の secret にランダムな値を使用するよう修正
+  - uid にsessionID のハッシュ値を使うよう修正
+
 ## v1.5.0 / 2026-08-22
 
   - SIGTERM受信時に graceful shutdown するよう修正
