@@ -8,6 +8,44 @@ const agent = 'mjai-proxy/' + version.replace(/^(\d+\.\d+).*$/,'$1');
 const net       = require('net');
 const { spawn } = require('child_process');
 
+let cookie;
+
+function login() {
+
+    fetch(url + '/auth/', {
+        method:   'POST',
+        headers:  { 'User-Agent': agent },
+        body:     new URLSearchParams({ name: name, passwd: '*'}),
+        redirect: 'manual'
+    }).then(res=>{
+        for (let c of (res.headers.get('Set-Cookie')||'').split(/,\s*/)) {
+            if (! c.match(/^MAJIANG=/)) continue;
+            cookie = c.replace(/^MAJIANG=/,'').replace(/; .*$/,'');
+
+            process.on('SIGTERM', logout);
+            process.on('SIGINT',  logout);
+
+            exec_bot();
+
+            break;
+        }
+        if (! cookie) console.log('ログインエラー:', url);
+    }).catch(err=>{
+        console.log('接続エラー:', err.toString());
+    });
+}
+
+function logout() {
+
+    fetch(url + '/logout', {
+        method:   'POST',
+        headers:  { 'User-Agent': agent,
+                    'Cookie':     `MAJIANG=${cookie}`},
+    }).then(res=>{
+        process.exit();
+    });
+}
+
 function exec_bot() {
 
     const server = net.createServer((sock)=>{
@@ -25,8 +63,8 @@ function exec_bot() {
         const port = server.address().port;
 
         spawn(bot, [`mjsonp://127.0.0.1:${port}/${room}`])
-            .on('error', (e)=>{
-                console.error(e.toString());
+            .on('error', (err)=>{
+                console.error(err.toString());
                 process.exit(-1);
             });
     });
@@ -40,9 +78,11 @@ const argv = require('yargs')
     .demandCommand(2)
     .argv;
 
+const name = argv.name;
+const room = argv.room;
+
 const url  = argv._[0] == '-' ? 'http://127.0.0.1:4615/server'
                               : ('' + argv._[0]).replace(/\/$/,'');
-const room = argv.room;
 const bot  = argv._[1];
 
-exec_bot();
+login();
