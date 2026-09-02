@@ -6,6 +6,7 @@ const { version } = require('../package.json');
 const agent = 'mjai-proxy/' + version.replace(/^(\d+\.\d+).*$/,'$1');
 
 const net       = require('net');
+const io        = require('socket.io-client');
 const { spawn } = require('child_process');
 
 let cookie;
@@ -46,9 +47,34 @@ function logout() {
     });
 }
 
+function error(msg) {
+    console.log('ERROR:', msg);
+    logout();
+}
+
+function connect() {
+
+    const server = url.replace(/^(https?:\/\/[^\/]*)\/.*$/,'$1');
+    const path   = url.replace(/^https?:\/\/[^\/]*/,'').replace(/\/$/,'');
+    const sock = io(server, {
+                        path: `${path}/socket.io/`,
+                        extraHeaders: {
+                            'User-Agent': agent,
+                            Cookie: `MAJIANG=${cookie}`,
+                        }
+                    });
+
+    sock.on('ERROR', error);
+    sock.on('END',   logout);
+    sock.on('ROOM',  ()=> sock.on('HELLO', logout));
+    sock.on('START', ()=> sock.off('ERROR'));
+
+    sock.emit('ROOM', room);
+}
+
 function exec_bot() {
 
-    const server = net.createServer((sock)=>{
+    const proxy = net.createServer((sock)=>{
 
         let reply = { type: 'hello', protocol: 'mjsonp', protocol_version: 3 };
         if (argv.verbose) console.log('<-', reply);
@@ -57,12 +83,14 @@ function exec_bot() {
         sock.on('data', (data)=>{
             let msg = JSON.parse(data.toString('utf-8'));
             if (argv.verbose) console.log('->', msg);
+
+            if (msg.type == 'join') connect();
         });
     }).listen(()=>{
 
-        const port = server.address().port;
+        const port = proxy.address().port;
 
-        spawn(bot, [`mjsonp://127.0.0.1:${port}/${room}`])
+        spawn(bot_name, [`mjsonp://127.0.0.1:${port}/${room}`])
             .on('error', (err)=>{
                 console.error(err.toString());
                 process.exit(-1);
@@ -83,6 +111,6 @@ const room = argv.room;
 
 const url  = argv._[0] == '-' ? 'http://127.0.0.1:4615/server'
                               : ('' + argv._[0]).replace(/\/$/,'');
-const bot  = argv._[1];
+const bot_name = argv._[1];
 
 login();
