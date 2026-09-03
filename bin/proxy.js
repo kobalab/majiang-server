@@ -94,7 +94,7 @@ function exec_bot() {
                         { shell: argv.shell }
             ).on('error', (err)=>{
                 console.error(err.toString());
-                process.exit(-1);
+                logout();
             });
     });
 }
