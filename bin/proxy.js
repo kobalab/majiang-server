@@ -7,6 +7,7 @@ const agent = 'mjai-proxy/' + version.replace(/^(\d+\.\d+).*$/,'$1');
 
 const net       = require('net');
 const io        = require('socket.io-client');
+const readline = require('readline');
 const { execFile } = require('child_process');
 
 let cookie;
@@ -76,17 +77,19 @@ function exec_bot() {
 
     const proxy = net.createServer((sock)=>{
 
+        const line = readline.createInterface(sock);
+
         let reply = { type: 'hello', protocol: 'mjsonp', protocol_version: 3 };
         if (argv.verbose) console.log('<-', reply);
         sock.write(JSON.stringify(reply) + '\n');
 
-        sock.on('data', (data)=>{
+        line.once('line', (data)=>{
             let msg = JSON.parse(data.toString('utf-8'));
             if (argv.verbose) console.log('->', msg);
 
-            if (msg.type == 'join') connect();
+            if (msg.type == 'join') connect(sock, line);
         });
-        sock.on('error', (err)=>{
+        line.on('error', (err)=>{
             logout();
         });
     }).listen(()=>{
