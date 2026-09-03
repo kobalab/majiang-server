@@ -90,8 +90,9 @@ function exec_bot() {
 
         const port = proxy.address().port;
 
-        spawn(bot_name, [`mjsonp://127.0.0.1:${port}/${room}`])
-            .on('error', (err)=>{
+        spawn(bot_name, [`mjsonp://127.0.0.1:${port}/${room}`],
+                        { shell: argv.shell }
+            ).on('error', (err)=>{
                 console.error(err.toString());
                 process.exit(-1);
             });
@@ -103,6 +104,7 @@ const argv = require('yargs')
     .option('name',     { alias: 'n', default: 'Mjaiボット'})
     .option('room',     { alias: 'r', type: 'string', demandOption: true })
     .option('verbose',  { alias: 'v', boolean: true })
+    .option('shell',    { alias: 'S', boolean: true })
     .demandCommand(2)
     .argv;
 
