@@ -115,7 +115,7 @@ const argv = require('yargs')
     .argv;
 
 const name = argv.name;
-const room = argv.room;
+const room = argv.room || '-';
 
 const url  = argv._[0] == '-' ? 'http://127.0.0.1:4615/server'
                               : ('' + argv._[0]).replace(/\/$/,'');
