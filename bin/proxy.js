@@ -20,7 +20,7 @@ function login() {
         body:     new URLSearchParams({ name: name, passwd: '*'}),
         redirect: 'manual'
     }).then(res=>{
-        for (let c of (res.headers.get('Set-Cookie')||'').split(/,\s*/)) {
+        for (let c of res.headers.getSetCookie()) {
             if (! c.match(/^MAJIANG=/)) continue;
             cookie = c.replace(/^MAJIANG=/,'').replace(/; .*$/,'');
 
