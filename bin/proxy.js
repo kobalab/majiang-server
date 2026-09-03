@@ -7,7 +7,7 @@ const agent = 'mjai-proxy/' + version.replace(/^(\d+\.\d+).*$/,'$1');
 
 const net       = require('net');
 const io        = require('socket.io-client');
-const { spawn } = require('child_process');
+const { execFile } = require('child_process');
 
 let cookie;
 
@@ -93,7 +93,7 @@ function exec_bot() {
 
         const port = proxy.address().port;
 
-        spawn(bot_name, [`mjsonp://127.0.0.1:${port}/${room}`],
+        execFile(bot_name, [`mjsonp://127.0.0.1:${port}/${room}`],
                         { shell: argv.shell }
             ).on('error', (err)=>{
                 console.error(err.toString());
