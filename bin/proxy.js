@@ -86,6 +86,9 @@ function exec_bot() {
 
             if (msg.type == 'join') connect();
         });
+        sock.on('error', (err)=>{
+            logout();
+        });
     }).listen(()=>{
 
         const port = proxy.address().port;
