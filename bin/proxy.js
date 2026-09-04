@@ -96,6 +96,11 @@ function exec_bot() {
 
         const port = proxy.address().port;
 
+        if (argv.noexec) {
+            console.log(`${bot_name} mjsonp://127.0.0.1:${port}/${room}`);
+            return;
+        }
+
         execFile(bot_name, [`mjsonp://127.0.0.1:${port}/${room}`],
                         { shell: argv.shell }
             ).on('error', (err)=>{
@@ -111,6 +116,7 @@ const argv = require('yargs')
     .option('room',     { alias: 'r', type: 'string', demandOption: true })
     .option('verbose',  { alias: 'v', boolean: true })
     .option('shell',    { alias: 'S', boolean: true })
+    .option('noexec',   { alias: 'X', boolean: true })
     .demandCommand(2)
     .argv;
 
