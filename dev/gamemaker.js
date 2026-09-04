@@ -36,7 +36,7 @@ function login() {
         }
         if (! cookie) console.log('ログインエラー:', url);
     }).catch(err=>{
-        console.log('接続エラー:', err);
+        console.log('接続エラー:', url);
     });
 }
 
