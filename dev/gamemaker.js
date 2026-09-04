@@ -7,9 +7,8 @@ const agent = 'majiang-bot/' + version.replace(/^(\d+\.\d+).*$/,'$1');
 
 const io = require('socket.io-client');
 
+const Majiang = require('@kobalab/majiang-core');
 const Player = require('@kobalab/majiang-ai');
-
-const rule = require('@kobalab/majiang-core').rule();
 
 let room;
 let COOKIES = [];
@@ -100,9 +99,12 @@ const argv = require('yargs')
     .usage('Usage: $0 [ server-url ]')
     .option('prefix',   { alias: 'p', default: 'BOT'})
     .option('players',  { alias: 'n', default: 3    })
+    .option('round',    { alias: 'r', default: 2    })
     .argv;
 
 const url = (argv._[0] || 'http://127.0.0.1:4615/server').replace(/\/$/,'');
+
+const rule = Majiang.rule({ '場数': argv.round });
 
 process.on('SIGTERM', ()=> logout());
 process.on('SIGINT',  ()=> logout());
