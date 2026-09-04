@@ -9,9 +9,7 @@ const io = require('socket.io-client');
 
 const Player = require('@kobalab/majiang-ai');
 
-const rule = require('@kobalab/majiang-core').rule(
-            { '場数': 0, '途中流局あり': false, 'トビ終了あり': false,
-              '連荘方式': 0, '延長戦方式': 0});
+const rule = require('@kobalab/majiang-core').rule();
 
 let room;
 let COOKIES = [];
