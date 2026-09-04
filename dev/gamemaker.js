@@ -40,17 +40,17 @@ function login() {
     });
 }
 
-function logout(n = 0) {
+function logout() {
 
-    console.log('logout:', n);
+     if (! COOKIES.length) process.exit();
+     let cookie = COOKIES.shift();
 
     fetch(url + '/logout', {
         method:   'POST',
         headers:  { 'User-Agent': agent,
-                    'Cookie':     `MAJIANG=${COOKIES[n]}`},
+                    'Cookie':     `MAJIANG=${cookie}`},
     }).then(res =>{
-        if (n + 1 < COOKIES.length) logout(n + 1);
-        else process.exit();
+        logout();
     });
 }
 
