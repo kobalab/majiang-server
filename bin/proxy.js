@@ -73,32 +73,43 @@ function connect(bot, line) {
     sock.on('ROOM',  ()=> sock.on('HELLO', logout));
     sock.on('START', ()=> sock.off('ERROR'));
 
+    function recv() {
+        return new Promise(resolve =>{
+            line.once('line',  (res)=>{
+                res = JSON.parse(res);
+                if (argv.verbose) console.log('->', res);
+                resolve(res);
+            });
+        });
+    }
+
+    function send(req) {
+        if (argv.verbose) console.log('<-', req);
+        bot.write(JSON.stringify(req) + '\n');
+    }
+
     let convreply = converter();
 
-    sock.on('GAME', (msg)=>{
+    sock.on('GAME', async (msg)=>{
         if (msg.qipai) {
             convreply = converter();
         }
         let req = convmsg(msg);
         if (! req) return;
 
-        if (argv.verbose) console.log('<-', req);
-        bot.write(JSON.stringify(req) + '\n');
+        send(req);
 
         if (msg.jieju) {
             let reply = {};
             reply.seq = msg.seq;
             sock.emit('GAME', reply);
+            return;
         }
 
-        line.once('line', (res)=>{
-            res = JSON.parse(res);
-            if (argv.verbose) console.log('->', res);
-            if (! msg.seq) return;
-            let reply = convreply(res);
-            reply.seq = msg.seq;
-            sock.emit('GAME', reply);
-        });
+        let res = await recv();
+        let reply = convreply(res);
+        reply.seq = msg.seq;
+        sock.emit('GAME', reply);
     });
 
     sock.emit('ROOM', room);
