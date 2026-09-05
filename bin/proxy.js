@@ -10,7 +10,7 @@ const io        = require('socket.io-client');
 const readline = require('readline');
 const { execFile } = require('child_process');
 
-const convmsg = require('../lib/protocol').convmsg();
+const convmsg = require('../lib/convmsg')();
 
 let cookie;
 
