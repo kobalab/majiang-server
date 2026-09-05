@@ -10,6 +10,8 @@ const io        = require('socket.io-client');
 const readline = require('readline');
 const { execFile } = require('child_process');
 
+const convmsg = require('../lib/protocol').convmsg();
+
 let cookie;
 
 function login() {
@@ -53,7 +55,7 @@ function error(msg) {
     logout();
 }
 
-function connect() {
+function connect(bot, line) {
 
     const server = url.replace(/^(https?:\/\/[^\/]*)\/.*$/,'$1');
     const path   = url.replace(/^https?:\/\/[^\/]*/,'').replace(/\/$/,'');
@@ -69,6 +71,28 @@ function connect() {
     sock.on('END',   logout);
     sock.on('ROOM',  ()=> sock.on('HELLO', logout));
     sock.on('START', ()=> sock.off('ERROR'));
+    sock.on('GAME', (msg)=>{
+        let req = convmsg(msg);
+        if (! req) return;
+
+        if (argv.verbose) console.log('<-', req);
+        bot.write(JSON.stringify(req) + '\n');
+
+        if (msg.jieju) {
+            let reply = {};
+            reply.seq = msg.seq;
+            sock.emit('GAME', reply);
+        }
+
+        line.once('line', (res)=>{
+            res = JSON.parse(res);
+            if (argv.verbose) console.log('->', res);
+            if (! msg.seq) return;
+            let reply = {};
+            reply.seq = msg.seq;
+            sock.emit('GAME', reply);
+        });
+    });
 
     sock.emit('ROOM', room);
 }
@@ -79,7 +103,7 @@ function exec_bot() {
 
         const line = readline.createInterface(sock);
 
-        let reply = { type: 'hello', protocol: 'mjsonp', protocol_version: 3 };
+        let reply = { type: 'hello', protocol: 'mjsonp', protocol_version: 1 };
         if (argv.verbose) console.log('<-', reply);
         sock.write(JSON.stringify(reply) + '\n');
 
