@@ -110,6 +110,11 @@ function connect(bot, line) {
         let reply = convreply(res);
         reply.seq = msg.seq;
         sock.emit('GAME', reply);
+
+        if (msg.hule || msg.pingju) {
+            send({ type: 'end_kyoku' });
+            await recv();
+        }
     });
 
     sock.emit('ROOM', room);
