@@ -11,6 +11,7 @@ const readline = require('readline');
 const { execFile } = require('child_process');
 
 const convmsg = require('../lib/convmsg')();
+const converter = require('../lib/convreply');
 
 let cookie;
 
@@ -71,7 +72,13 @@ function connect(bot, line) {
     sock.on('END',   logout);
     sock.on('ROOM',  ()=> sock.on('HELLO', logout));
     sock.on('START', ()=> sock.off('ERROR'));
+
+    let convreply = converter();
+
     sock.on('GAME', (msg)=>{
+        if (msg.qipai) {
+            convreply = converter();
+        }
         let req = convmsg(msg);
         if (! req) return;
 
@@ -88,7 +95,7 @@ function connect(bot, line) {
             res = JSON.parse(res);
             if (argv.verbose) console.log('->', res);
             if (! msg.seq) return;
-            let reply = {};
+            let reply = convreply(res);
             reply.seq = msg.seq;
             sock.emit('GAME', reply);
         });
