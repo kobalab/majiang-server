@@ -97,7 +97,7 @@ function connect(bot, line) {
         }
         let req = convmsg(msg);
         if (! req) return;
-        if (msg.dapai && msg.dapai.p.slice(-1) == '*') {
+        if (msg.dapai && msg.dapai.p.slice(-1) == '*' && ! lizhi) {
             send({ type: 'reach', actor: req.actor });
             await recv();
             lizhi = true;
@@ -121,6 +121,7 @@ function connect(bot, line) {
         if (reply.mjai && reply.mjai.type == 'reach') {
             send(reply.mjai);
             reply = convreply(await recv());
+            lizhi = true;
         }
         reply.seq = msg.seq;
         sock.emit('GAME', reply);
