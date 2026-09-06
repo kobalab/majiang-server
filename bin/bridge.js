@@ -88,6 +88,17 @@ function connect(bot, line) {
         bot.write(JSON.stringify(req) + '\n');
     }
 
+    function reach_accepted(id) {
+        let board = convmsg(),
+            deltas = [], scores = [];
+        for (let i = 0; i < 4; i++) {
+            deltas[i] = i == id ? -1000 : 0;
+            scores[i] = board.defen[i];
+        }
+        return { type: 'reach_accepted', actor: id,
+                 deltas: deltas, scores: scores };
+    }
+
     line.on('close', ()=>{
         console.log(`${bot_name}: disconnected.`);
         logout();
@@ -102,15 +113,15 @@ function connect(bot, line) {
         }
         let req = convmsg(msg);
         if (! req) return;
-        if (msg.dapai && msg.dapai.p.slice(-1) == '*' && ! lizhi) {
+        if (msg.dapai && msg.dapai.p.slice(-1) == '*' && lizhi == null) {
             send({ type: 'reach', actor: req.actor });
             await recv();
-            lizhi = true;
+            lizhi = req.actor;
         }
-        else if (lizhi && ! req.hule) {
-            send({ type: 'reach_accepted' });
+        else if (lizhi != null && ! req.hule) {
+            send(reach_accepted(lizhi));
             await recv();
-            lizhi = false;
+            lizhi = null;
         }
 
         send(req);
@@ -125,9 +136,9 @@ function connect(bot, line) {
 
         let reply = convreply(await recv());
         if (reply.mjai && reply.mjai.type == 'reach') {
+            lizhi = reply.mjai.actor;
             send(reply.mjai);
             reply = convreply(await recv());
-            lizhi = true;
         }
         reply.seq = msg.seq;
         sock.emit('GAME', reply);
