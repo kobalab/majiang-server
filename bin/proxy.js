@@ -102,7 +102,7 @@ function connect(bot, line) {
             await recv();
             lizhi = true;
         }
-        else if (lizhi) {
+        else if (lizhi && ! req.hule) {
             send({ type: 'reach_accepted' });
             await recv();
             lizhi = false;
