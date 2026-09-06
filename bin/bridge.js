@@ -3,7 +3,7 @@
 "use strict";
 
 const { version } = require('../package.json');
-const agent = 'mjai-proxy/' + version.replace(/^(\d+\.\d+).*$/,'$1');
+const agent = 'mjai-bridge/' + version.replace(/^(\d+\.\d+).*$/,'$1');
 
 const net       = require('net');
 const io        = require('socket.io-client');
@@ -137,7 +137,7 @@ function connect(bot, line) {
 
 function exec_bot() {
 
-    const proxy = net.createServer((sock)=>{
+    const bridge = net.createServer((sock)=>{
 
         const line = readline.createInterface(sock);
 
@@ -156,7 +156,7 @@ function exec_bot() {
         });
     }).listen(()=>{
 
-        const port = proxy.address().port;
+        const port = bridge.address().port;
 
         if (argv.noexec) {
             console.log(`${bot_name} mjsonp://127.0.0.1:${port}/${room}`);
