@@ -88,6 +88,11 @@ function connect(bot, line) {
         bot.write(JSON.stringify(req) + '\n');
     }
 
+    line.on('close', ()=>{
+        console.log(`${bot_name}: disconnected.`);
+        logout();
+    });
+
     let convreply = converter();
     let lizhi;
 
@@ -111,6 +116,7 @@ function connect(bot, line) {
         send(req);
 
         if (msg.jieju) {
+            line.removeAllListeners('close');
             let reply = {};
             reply.seq = msg.seq;
             sock.emit('GAME', reply);
