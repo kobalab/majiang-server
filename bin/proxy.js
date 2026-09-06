@@ -117,8 +117,11 @@ function connect(bot, line) {
             return;
         }
 
-        let res = await recv();
-        let reply = convreply(res);
+        let reply = convreply(await recv());
+        if (reply.mjai && reply.mjai.type == 'reach') {
+            send(reply.mjai);
+            reply = convreply(await recv());
+        }
         reply.seq = msg.seq;
         sock.emit('GAME', reply);
 
