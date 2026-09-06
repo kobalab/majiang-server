@@ -89,6 +89,7 @@ function connect(bot, line) {
     }
 
     let convreply = converter();
+    let lizhi;
 
     sock.on('GAME', async (msg)=>{
         if (msg.qipai) {
@@ -96,6 +97,16 @@ function connect(bot, line) {
         }
         let req = convmsg(msg);
         if (! req) return;
+        if (msg.dapai && msg.dapai.p.slice(-1) == '*') {
+            send({ type: 'reach', actor: req.actor });
+            await recv();
+            lizhi = true;
+        }
+        else if (lizhi) {
+            send({ type: 'reach_accepted' });
+            await recv();
+            lizhi = false;
+        }
 
         send(req);
 
