@@ -110,18 +110,19 @@ function connect(bot, line) {
     sock.on('GAME', async (msg)=>{
         if (msg.qipai) {
             convreply = converter();
+            lizhi = null;
         }
         let req = convmsg(msg);
         if (! req) return;
         if (msg.dapai && msg.dapai.p.slice(-1) == '*' && lizhi == null) {
+            lizhi = req.actor;
             send({ type: 'reach', actor: req.actor });
             await recv();
-            lizhi = req.actor;
         }
-        else if (lizhi != null && ! req.hule) {
+        else if (lizhi != null && (msg.zimo || msg.fulou)) {
             send(reach_accepted(lizhi));
-            await recv();
             lizhi = null;
+            await recv();
         }
 
         send(req);
