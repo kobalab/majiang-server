@@ -177,21 +177,25 @@ function exec_bot() {
         const port = bridge.address().port;
 
         if (argv.noexec) {
-            console.log(`${bot_name} mjsonp://127.0.0.1:${port}/${room}`);
+            console.log([bot_name, ...bot_param,
+                        `mjsonp://127.0.0.1:${port}/${room}`].join(' '));
             return;
         }
 
-        execFile(bot_name, [`mjsonp://127.0.0.1:${port}/${room}`],
-                        { shell: argv.shell }
-            ).on('error', (err)=>{
-                console.error(err.toString());
-                logout();
-            });
+        execFile(bot_name, [...bot_param, `mjsonp://127.0.0.1:${port}/${room}`],
+                    { shell: argv.shell }
+        ).on('error', (err)=>{
+            console.error(err.toString());
+            logout();
+        }).on('exit', ()=>{
+            logout();
+        }).stderr.pipe(process.stderr);
     });
 }
 
 const argv = require('yargs')
-    .usage('Usage: $0 server-url mjai-bot -- [ bot-params... ]')
+    .usage('Usage: $0 -r room server-url mjai-bot -- [ bot-params... ]')
+    .parserConfiguration({ 'populate--': true })
     .option('name',     { alias: 'n', default: 'Mjaiボット'})
     .option('room',     { alias: 'r', type: 'string', demandOption: true })
     .option('verbose',  { alias: 'v', boolean: true })
@@ -206,5 +210,6 @@ const room = argv.room || '-';
 const url  = argv._[0] == '-' ? 'http://127.0.0.1:4615/server'
                               : ('' + argv._[0]).replace(/\/$/,'');
 const bot_name = argv._[1];
+const bot_param = argv['--']||[];
 
 login();
