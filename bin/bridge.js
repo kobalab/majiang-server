@@ -194,7 +194,7 @@ function exec_bot() {
 }
 
 const argv = require('yargs')
-    .usage('Usage: $0 -r room server-url mjai-bot -- [ bot-params... ]')
+    .usage('Usage: $0 -r room server-url mjai-bot [ -- bot-params... ]')
     .parserConfiguration({ 'populate--': true })
     .option('name',     { alias: 'n', default: 'Mjaiボット'})
     .option('room',     { alias: 'r', type: 'string', demandOption: true })
