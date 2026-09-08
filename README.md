@@ -55,7 +55,7 @@ $ majiang-bot -r A1234 -n '麻雀ロボ' https://kobalab.net/majiang/server
 </dl>
 
 ### mjai-bridge -r *room* *server-url* *mjai-bot* [ -- *bot-params*... ]
-麻雀サーバーにMjai完全互換のボットを接続する。
+麻雀サーバーにMjaiプロトコル完全互換のボットを接続する。
 ```bash
 $ mjai-bridge -r A1234 https://kobalab.net/majiang/server mjai-manue
 ```
