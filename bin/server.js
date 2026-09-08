@@ -15,6 +15,7 @@ const argv = yargs
     .option('oauth',    { alias: 'o' })
     .option('store',    { alias: 's' })
     .option('status',   { alias: 'S', boolean: true })
+    .option('nowait',   {             boolean: true })
     .argv;
 const port = argv.port;
 const base = ('' + argv.baseurl)
@@ -46,6 +47,7 @@ const http = require('http').createServer(app);
 const io   = require('socket.io')(http, { path: `${base}/socket.io/` });
 
 const lobby = require('../lib/lobby')(io);
+lobby.nowait = argv.nowait;
 
 app.use(session);
 app.use(passport.initialize());
