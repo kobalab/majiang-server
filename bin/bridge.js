@@ -108,12 +108,15 @@ function connect(bot, line) {
     let lizhi;
 
     sock.on('GAME', async (msg)=>{
+
         if (msg.qipai) {
             convreply = converter();
             lizhi = null;
         }
+
         let req = convmsg(msg);
         if (! req) return;
+
         if (msg.dapai && msg.dapai.p.slice(-1) == '*' && lizhi == null) {
             lizhi = req.actor;
             send({ type: 'reach', actor: req.actor });
@@ -136,13 +139,17 @@ function connect(bot, line) {
         }
 
         let reply = convreply(await recv());
+
         if (reply.mjai && reply.mjai.type == 'reach') {
             lizhi = reply.mjai.actor;
             send(reply.mjai);
             reply = convreply(await recv());
         }
-        reply.seq = msg.seq;
-        sock.emit('GAME', reply);
+
+        if (msg.seq) {
+            reply.seq = msg.seq;
+            sock.emit('GAME', reply);
+        }
 
         if (msg.hule || msg.pingju) {
             send({ type: 'end_kyoku' });
