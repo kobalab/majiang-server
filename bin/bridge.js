@@ -9,6 +9,7 @@ const net       = require('net');
 const io        = require('socket.io-client');
 const readline = require('readline');
 const { execFile } = require('child_process');
+const util     = require('util');
 
 const convmsg = require('../lib/convmsg')();
 const converter = require('../lib/convreply');
@@ -77,14 +78,18 @@ function connect(bot, line) {
         return new Promise(resolve =>{
             line.once('line',  (res)=>{
                 res = JSON.parse(res);
-                if (argv.verbose) console.log('->', res);
+                if (argv.verbose) console.log('->', util.inspect(res,
+                                            { depth: null,
+                                              colors: process.stdout.isTTY }));
                 resolve(res);
             });
         });
     }
 
     function send(req) {
-        if (argv.verbose) console.log('<-', req);
+        if (argv.verbose) console.log('<-', util.inspect(req,
+                                            { depth: null,
+                                              colors: process.stdout.isTTY }));
         bot.write(JSON.stringify(req) + '\n');
     }
 
@@ -167,12 +172,16 @@ function exec_bot() {
         const line = readline.createInterface(sock);
 
         let reply = { type: 'hello', protocol: 'mjsonp', protocol_version: 1 };
-        if (argv.verbose) console.log('<-', reply);
+        if (argv.verbose) console.log('<-', util.inspect(reply,
+                                            { depth: null,
+                                              colors: process.stdout.isTTY }));
         sock.write(JSON.stringify(reply) + '\n');
 
         line.once('line', (data)=>{
             let msg = JSON.parse(data.toString('utf-8'));
-            if (argv.verbose) console.log('->', msg);
+            if (argv.verbose) console.log('->', util.inspect(msg,
+                                            { depth: null,
+                                              colors: process.stdout.isTTY }));
 
             if (msg.type == 'join') connect(sock, line);
         });
