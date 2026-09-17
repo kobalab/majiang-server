@@ -193,12 +193,12 @@ function exec_bot() {
         const port = bridge.address().port;
 
         if (argv.noexec) {
-            console.log([bot_name, ...bot_param,
-                        `mjsonp://127.0.0.1:${port}/${room}`].join(' '));
+            console.log([bot_name, `mjsonp://127.0.0.1:${port}/${room}`,
+                        ...bot_param].join(' '));
             return;
         }
 
-        execFile(bot_name, [...bot_param, `mjsonp://127.0.0.1:${port}/${room}`],
+        execFile(bot_name, [`mjsonp://127.0.0.1:${port}/${room}`, ...bot_param],
                     { shell: argv.shell }
         ).on('error', (err)=>{
             console.error(err.toString());
