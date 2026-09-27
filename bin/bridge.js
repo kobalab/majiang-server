@@ -139,23 +139,23 @@ function connect(bot, line) {
 
         if (msg.jieju) {
             line.removeAllListeners('close');
-            let reply = {};
-            reply.seq = msg.seq;
-            sock.emit('GAME', reply);
+            let rep = {};
+            rep.seq = msg.seq;
+            sock.emit('GAME', rep);
             return;
         }
 
-        let reply = convrep(await recv());
+        let rep = convrep(await recv());
 
-        if (reply.mjai && reply.mjai.type == 'reach') {
-            lizhi = reply.mjai.actor;
-            send(reply.mjai);
-            reply = convrep(await recv());
+        if (rep.mjai && rep.mjai.type == 'reach') {
+            lizhi = rep.mjai.actor;
+            send(rep.mjai);
+            rep = convrep(await recv());
         }
 
         if (msg.seq) {
-            reply.seq = msg.seq;
-            sock.emit('GAME', reply);
+            rep.seq = msg.seq;
+            sock.emit('GAME', rep);
         }
 
         if (msg.hule || msg.pingju) {
@@ -173,11 +173,11 @@ function exec_bot() {
 
         const line = readline.createInterface(sock);
 
-        let reply = { type: 'hello', protocol: 'mjsonp', protocol_version: 1 };
-        if (argv.verbose) console.log('<-', util.inspect(reply,
+        let rep = { type: 'hello', protocol: 'mjsonp', protocol_version: 1 };
+        if (argv.verbose) console.log('<-', util.inspect(rep,
                                             { depth: null,
                                               colors: process.stdout.isTTY }));
-        sock.write(JSON.stringify(reply) + '\n');
+        sock.write(JSON.stringify(rep) + '\n');
 
         line.once('line', (data)=>{
             let msg = JSON.parse(data.toString('utf-8'));
