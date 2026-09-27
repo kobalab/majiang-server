@@ -79,6 +79,11 @@ function connect(bot, line) {
         queue = queue.then(()=> convert(msg));
     });
 
+    line.on('close', ()=>{
+        console.log(`${bot_name}: disconnected.`);
+        logout();
+    });
+
     function recv() {
         return new Promise(resolve =>{
             line.once('line',  (res)=>{
@@ -97,11 +102,6 @@ function connect(bot, line) {
                                               colors: process.stdout.isTTY }));
         bot.write(JSON.stringify(req) + '\n');
     }
-
-    line.on('close', ()=>{
-        console.log(`${bot_name}: disconnected.`);
-        logout();
-    });
 
     let convrep = converter.convrep();
     let convmsg = converter.convmsg();
