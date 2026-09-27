@@ -31,6 +31,8 @@ $ npm i -g @kobalab/majiang-server
     <dd>セッションデータを保存するディレクトリ(省略可能)</dd>
 <dt>--status, -S</dt>
     <dd><code>/server/status</code> でステータス表示を有効にする</dd>
+<dt>--nowait</dt>
+    <dd>待ち時間を持たず、最速で局を進行する(デバッグ用)</dd>
 </dl>
 
 **関連記事:** [麻雀サーバーの使い方](https://blog.kobalab.net/entry/2024/02/15/081605)

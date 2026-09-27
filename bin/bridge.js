@@ -11,8 +11,7 @@ const readline = require('readline');
 const { execFile } = require('child_process');
 const util     = require('util');
 
-const convmsg = require('../lib/convmsg')();
-const converter = require('../lib/convreply');
+const converter = require('@kobalab/mjai-bot/convert');
 
 let cookie;
 
@@ -74,6 +73,17 @@ function connect(bot, line) {
     sock.on('ROOM',  ()=> sock.on('HELLO', logout));
     sock.on('START', ()=> sock.off('ERROR'));
 
+    let queue = Promise.resolve();
+
+    sock.on('GAME', (msg)=>{
+        queue = queue.then(()=> convert(msg));
+    });
+
+    line.on('close', ()=>{
+        console.log(`${bot_name}: disconnected.`);
+        logout();
+    });
+
     function recv() {
         return new Promise(resolve =>{
             line.once('line',  (res)=>{
@@ -93,29 +103,15 @@ function connect(bot, line) {
         bot.write(JSON.stringify(req) + '\n');
     }
 
-    function reach_accepted(id) {
-        let board = convmsg(),
-            deltas = [], scores = [];
-        for (let i = 0; i < 4; i++) {
-            deltas[i] = i == id ? -1000 : 0;
-            scores[i] = board.defen[i];
-        }
-        return { type: 'reach_accepted', actor: id,
-                 deltas: deltas, scores: scores };
-    }
+    let convrep = converter.convrep();
+    let convmsg = converter.convmsg();
 
-    line.on('close', ()=>{
-        console.log(`${bot_name}: disconnected.`);
-        logout();
-    });
-
-    let convreply = converter();
     let lizhi;
 
-    sock.on('GAME', async (msg)=>{
+    async function convert(msg) {
 
         if (msg.qipai) {
-            convreply = converter();
+            convrep = converter.convrep();
             lizhi = null;
         }
 
@@ -128,39 +124,45 @@ function connect(bot, line) {
             await recv();
         }
         else if (lizhi != null && (msg.zimo || msg.fulou)) {
-            send(reach_accepted(lizhi));
-            lizhi = null;
+            let deltas = [], scores = [];
+            for (let id = 0; id < 4; id++) {
+                deltas[id] = id == lizhi ? -1000 : 0;
+                scores[id] = convmsg().defen[id];
+            }
+            send({ type: 'reach_accepted', actor: lizhi,
+                   deltas: deltas, scores: scores });
             await recv();
+            lizhi = null;
         }
 
         send(req);
 
         if (msg.jieju) {
             line.removeAllListeners('close');
-            let reply = {};
-            reply.seq = msg.seq;
-            sock.emit('GAME', reply);
+            let rep = {};
+            rep.seq = msg.seq;
+            sock.emit('GAME', rep);
             return;
         }
 
-        let reply = convreply(await recv());
+        let rep = convrep(await recv());
 
-        if (reply.mjai && reply.mjai.type == 'reach') {
-            lizhi = reply.mjai.actor;
-            send(reply.mjai);
-            reply = convreply(await recv());
+        if (rep.mjai && rep.mjai.type == 'reach') {
+            lizhi = rep.mjai.actor;
+            send(convmsg(rep));
+            rep = convrep(await recv());
         }
 
         if (msg.seq) {
-            reply.seq = msg.seq;
-            sock.emit('GAME', reply);
+            rep.seq = msg.seq;
+            sock.emit('GAME', rep);
         }
 
         if (msg.hule || msg.pingju) {
             send({ type: 'end_kyoku' });
             await recv();
         }
-    });
+    }
 
     sock.emit('ROOM', room);
 }
@@ -171,11 +173,11 @@ function exec_bot() {
 
         const line = readline.createInterface(sock);
 
-        let reply = { type: 'hello', protocol: 'mjsonp', protocol_version: 1 };
-        if (argv.verbose) console.log('<-', util.inspect(reply,
+        let rep = { type: 'hello', protocol: 'mjsonp', protocol_version: 1 };
+        if (argv.verbose) console.log('<-', util.inspect(rep,
                                             { depth: null,
                                               colors: process.stdout.isTTY }));
-        sock.write(JSON.stringify(reply) + '\n');
+        sock.write(JSON.stringify(rep) + '\n');
 
         line.once('line', (data)=>{
             let msg = JSON.parse(data.toString('utf-8'));
