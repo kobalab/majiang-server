@@ -1,3 +1,9 @@
+## v1.8.0 / 2026-09-28
+
+  - mjai-bridge が possible_actions を設定するよう修正
+    - @kobalab/mjai-bot をインストール
+  - 開槓の次の応答を取りこぼすバグを修正
+
 ### v1.7.4 / 2026-09-18
 
   - mjai-bridge が mortal-wrapper の起動に失敗するバグを修正
