@@ -1,6 +1,6 @@
 ### v1.7.4 / 2026-09-18
 
-  - majiang-bridge が mortal-wrapper の起動に失敗するバグを修正
+  - mjai-bridge が mortal-wrapper の起動に失敗するバグを修正
 
 ### v1.7.3 / 2026-09-17
 
