@@ -11,8 +11,7 @@ const readline = require('readline');
 const { execFile } = require('child_process');
 const util     = require('util');
 
-const convmsg = require('../lib/convmsg')();
-const converter = require('../lib/convreply');
+const converter = require('@kobalab/mjai-bot/convert');
 
 let cookie;
 
@@ -99,29 +98,20 @@ function connect(bot, line) {
         bot.write(JSON.stringify(req) + '\n');
     }
 
-    function reach_accepted(id) {
-        let board = convmsg(),
-            deltas = [], scores = [];
-        for (let i = 0; i < 4; i++) {
-            deltas[i] = i == id ? -1000 : 0;
-            scores[i] = board.defen[i];
-        }
-        return { type: 'reach_accepted', actor: id,
-                 deltas: deltas, scores: scores };
-    }
-
     line.on('close', ()=>{
         console.log(`${bot_name}: disconnected.`);
         logout();
     });
 
-    let convreply = converter();
+    let convrep = converter.convrep();
+    let convmsg = converter.convmsg();
+
     let lizhi;
 
     async function convert(msg) {
 
         if (msg.qipai) {
-            convreply = converter();
+            convrep = converter.convrep();
             lizhi = null;
         }
 
@@ -134,9 +124,15 @@ function connect(bot, line) {
             await recv();
         }
         else if (lizhi != null && (msg.zimo || msg.fulou)) {
-            send(reach_accepted(lizhi));
-            lizhi = null;
+            let deltas = [], scores = [];
+            for (let id = 0; id < 4; id++) {
+                deltas[id] = id == lizhi ? -1000 : 0;
+                scores[id] = convmsg().defen[id];
+            }
+            send({ type: 'reach_accepted', actor: lizhi,
+                   deltas: deltas, scores: scores });
             await recv();
+            lizhi = null;
         }
 
         send(req);
@@ -149,12 +145,12 @@ function connect(bot, line) {
             return;
         }
 
-        let reply = convreply(await recv());
+        let reply = convrep(await recv());
 
         if (reply.mjai && reply.mjai.type == 'reach') {
             lizhi = reply.mjai.actor;
             send(reply.mjai);
-            reply = convreply(await recv());
+            reply = convrep(await recv());
         }
 
         if (msg.seq) {
