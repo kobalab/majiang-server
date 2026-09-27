@@ -149,7 +149,7 @@ function connect(bot, line) {
 
         if (rep.mjai && rep.mjai.type == 'reach') {
             lizhi = rep.mjai.actor;
-            send(rep.mjai);
+            send(convmsg(rep));
             rep = convrep(await recv());
         }
 
