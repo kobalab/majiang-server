@@ -74,6 +74,12 @@ function connect(bot, line) {
     sock.on('ROOM',  ()=> sock.on('HELLO', logout));
     sock.on('START', ()=> sock.off('ERROR'));
 
+    let queue = Promise.resolve();
+
+    sock.on('GAME', (msg)=>{
+        queue = queue.then(()=> convert(msg));
+    });
+
     function recv() {
         return new Promise(resolve =>{
             line.once('line',  (res)=>{
@@ -112,7 +118,7 @@ function connect(bot, line) {
     let convreply = converter();
     let lizhi;
 
-    sock.on('GAME', async (msg)=>{
+    async function convert(msg) {
 
         if (msg.qipai) {
             convreply = converter();
@@ -160,7 +166,7 @@ function connect(bot, line) {
             send({ type: 'end_kyoku' });
             await recv();
         }
-    });
+    }
 
     sock.emit('ROOM', room);
 }
