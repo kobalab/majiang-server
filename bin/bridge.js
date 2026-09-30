@@ -173,7 +173,7 @@ function exec_bot() {
 
         const line = readline.createInterface(sock);
 
-        let rep = { type: 'hello', protocol: 'mjsonp', protocol_version: 1 };
+        let rep = { type: 'hello', protocol: 'mjsonp', protocol_version: 3 };
         if (argv.verbose) console.log('<-', util.inspect(rep,
                                             { depth: null,
                                               colors: process.stdout.isTTY }));
