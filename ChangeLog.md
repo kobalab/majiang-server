@@ -1,3 +1,11 @@
+### v1.8.1 / 2026-09-30
+
+  - mjai-bridgeの protocol_version を 3 に変更
+  - mjai-bot/convert により不要となったファイルを削除
+  - 脆弱性警告に対処
+    - brace-expansion 5.0.9 → 5.0.12
+    - engine.io 6.6.9 → 6.6.11
+
 ## v1.8.0 / 2026-09-28
 
   - mjai-bridge が possible_actions を設定するよう修正
