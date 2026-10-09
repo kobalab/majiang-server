@@ -1,3 +1,10 @@
+## v1.9.0 / 2026-10-09
+
+  - @kobalab/mjai-bot → @kobalab/mjai-converter
+  - 脆弱性警告に対処
+    - proxy-addr 2.0.7 → 2.0.8
+    - serialize-javascript 7.1.1 → 7.1.2
+
 ### v1.8.1 / 2026-09-30
 
   - mjai-bridgeの protocol_version を 3 に変更
