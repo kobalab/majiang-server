@@ -11,7 +11,7 @@ const readline = require('readline');
 const { execFile } = require('child_process');
 const util     = require('util');
 
-const converter = require('@kobalab/mjai-bot/convert');
+const converter = require('@kobalab/mjai-converter');
 
 let cookie;
 
